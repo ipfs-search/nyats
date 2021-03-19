@@ -13,10 +13,16 @@
 # https://github.com/libvips/libvips/commit/fc4ad15f97d2c989e491774765c0b18ca8b558eb
 # https://libvips.github.io/libvips/2019/11/29/True-streaming-for-libvips.html
 #curl $1 | vipsthumbnail stdin -e sRGB --size "$WIDTHx$HEIGHT" --smartcrop attention -s 128 -o $OUTPUT
+#
+# TODO: Use EXIF preview/thumbnail to avoid rendering the entire file, especially for lossless files.
+# exiftool -b -ThumbnailImage image.jpg > thumbnail.jpg (risks thumbnails are too small)
+# exiftool -b -PreviewImage image.cr2 > preview.jpeg (might be a better option - then to feed to vips)
+# exiftool -a -b -W %d%f_%t%-c.%s -preview:all YourFileOrDirectory (extracts all images)
+
 
 INPUT=$1
 OUTPUT=$2
 WIDTH=$3
 HEIGHT=$4
 
-vipsthumbnail $1 -e sRGB --size "$WIDTHx$HEIGHT" --smartcrop attention -s 128 -o $OUTPUT
+vipsthumbnail $INPUT -e sRGB -t --size "$WIDTHx$HEIGHT" --smartcrop attention -s 128 -o $OUTPUT

@@ -16,6 +16,8 @@
 # SVG: 5 Your ffmpeg needs to be compiled with --enable-librsvg
 # Not supported: PDF, SVG, Office
 
+# TODO: Check for 'cover.jpg' and/or cover.png in folder (if present) and use that over extracting.
+
 INPUT=$1
 OUTPUT=$2
 WIDTH=$3
