@@ -16,8 +16,12 @@
 #
 # TODO: Use EXIF preview/thumbnail to avoid rendering the entire file, especially for lossless files.
 # exiftool -b -ThumbnailImage image.jpg > thumbnail.jpg (risks thumbnails are too small)
-# exiftool -b -PreviewImage image.cr2 > preview.jpeg (might be a better option - then to feed to vips)
+# exiftool -b -x` image.cr2 > preview.jpeg (might be a better option - then to feed to vips)
 # exiftool -a -b -W %d%f_%t%-c.%s -preview:all YourFileOrDirectory (extracts all images)
+# 1. Try:
+# curl $INPUT | exiftool -fast -b -PreviewImage | vipsthumbnail stdin (...)
+# 2. If fail, read full file:
+# curl $INPUT | vipsthumbnail stdin (...)
 
 
 INPUT=$1
