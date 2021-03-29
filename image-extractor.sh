@@ -1,4 +1,4 @@
-#!/bin/sh -x
+#!/bin/sh
 #
 # Create thumbnails for images and vector files, supporting streaming over HTTP, using vips.
 # Generated file will be cropped to fill the exact dimensions specified.
@@ -29,4 +29,4 @@ OUTPUT=$2
 WIDTH=$3
 HEIGHT=$4
 
-vipsthumbnail $INPUT -e sRGB -t --size "${WIDTH}x${HEIGHT}" --smartcrop attention -s 128 -o $OUTPUT
+curl $INPUT | vipsthumbnail stdin -e sRGB -t --size "${WIDTH}x${HEIGHT}" --smartcrop attention -s 128 -o stdout
