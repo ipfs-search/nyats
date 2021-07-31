@@ -42,6 +42,22 @@ async function main() {
   });
 
   app.listen(port, () => console.log(`nyats server listening on port ${port}!`));
+
+  // Publish to IPNS every minute, but only if the root was changed
+  const root = await ipfs.files.stat('/', {hash: true});
+  var rootCidStr = root.cid.toString();
+
+  setInterval(async function() {
+    // Publish to IPNS - normally we only want to do this every few minutes or so - this is a client-side cache.
+    // Don't wait though!
+    const newroot = await ipfs.files.stat('/', {hash: true});
+    const newrootStr = newroot.cid.toString();
+    if (newrootStr != rootCidStr) {
+      console.log('Publishing root to IPNS.');
+      rootCidStr = newrootStr;
+      await ipfs.name.publish(newroot.cid);
+    }
+  }, 60000);
 }
 
 main()
