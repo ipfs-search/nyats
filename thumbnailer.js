@@ -13,8 +13,10 @@ module.exports = function(ipfs) {
 
     return stream.pipe(transformer);
   }
+
   async function getURL(path) {
     const root = await ipfs.files.stat('/', {hash: true});
+    console.debug(`MFS root: ${root.cid}`);
 
     return `http://localhost:8080/ipfs/${root.cid}${path}`
   }
@@ -25,14 +27,14 @@ module.exports = function(ipfs) {
     const path = `/${cid}-${width}-${height}.jpg`
 
     // If the file already exists, don't generate again
-    ipfs.files.stat(path, {hash: true}).then(function() {
-      // Return existing
+    try {
+      await ipfs.files.stat(path, {hash: true});
       return getURL(path);
-    }, function (error) {
+    } catch (error) {
       if (error.message != 'file does not exist') {
         throw error;
       }
-    });
+    }
 
     const input = ipfs.cat(`/${protocol}/${cid}`, {
       timeout: '30000', // 30s timeout
@@ -46,6 +48,7 @@ module.exports = function(ipfs) {
         create: true,
         cidVersion: 1,
         rawLeaves: true,
+        flush: true,
       });
 
     return getURL(path);
