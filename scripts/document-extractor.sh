@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Generate thumbnails for various office-type documents.
 # First uses OpenOffice to generate a PDF, then renders PDF into thumbnail of desired proportions.

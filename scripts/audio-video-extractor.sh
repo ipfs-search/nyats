@@ -1,4 +1,4 @@
-#!/bin/sh -x
+#!/bin/bash
 #
 # Create thumbnails for video files and images, supporting streaming over HTTP, using ffmpeg.
 # Generated file will be cropped to fill the exact dimensions specified. It will grab a v-frame at the first 40% scene change
