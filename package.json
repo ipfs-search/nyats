@@ -1,0 +1,29 @@
+{
+  "name": "nyats",
+  "version": "0.1.0",
+  "description": "Not Yet Another Thumbnail Service",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ipfs-search/nyats.git"
+  },
+  "keywords": [
+    "ipfs",
+    "thumbnails",
+    "sharp",
+    "vips"
+  ],
+  "author": "Mathijs de Bruin",
+  "license": "AGPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/ipfs-search/nyats/issues"
+  },
+  "homepage": "https://github.com/ipfs-search/nyats#readme",
+  "devDependencies": {
+    "eslint": "^7.32.0",
+    "eslint-config-defaults": "^9.0.0"
+  }
+}
