@@ -17,7 +17,7 @@ async function main() {
     // TODO: Validation
     // https://express-validator.github.io/docs/
     const { protocol, cid, width, height } = req.params;
-    const url = await thumbnailer(protocol, cid, width, height);
+    const url = await thumbnailer(protocol, cid, parseInt(width), parseInt(height));
     res.redirect(url);
   });
 
