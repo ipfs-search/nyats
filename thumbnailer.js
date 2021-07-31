@@ -23,10 +23,18 @@ module.exports = function(ipfs) {
   return async function(protocol, cid, width, height) {
     assert.equal(protocol, 'ipfs');
 
-    const input = ipfs.cat(`/${protocol}/${cid}`);
+    const input = ipfs.cat(`/${protocol}/${cid}`, {
+      timeout: '30000', // 30s timeout
+    });
 
     const thumbnail = getThumbnail(input, width, height);
-    const fsEntry = await ipfs.add(thumbnail);
+    const fsEntry = await ipfs.add({
+      path: cid,
+      content: thumbnail,
+    }, {
+      cidVersion: 1,
+      rawLeaves: true,
+    });
 
     return getURL(fsEntry);
   }
