@@ -32,7 +32,9 @@ HEIGHT=$4
 VIPSTHUMBNAIL="vipsthumbnail stdin -e sRGB -t --size "${WIDTH}x${HEIGHT}" --smartcrop attention -s 128 -o $OUTPUT"
 
 # Try to extract EXIF preview, prevent reading entire raw file
-# if ! curl $INPUT | exiftool -fast2 -b -PreviewImage - | $VIPSTHUMBNAIL; then
+# Note how exiftool is *very slow* and we should really want to do this with exiv2 or something similar.
+# Probably need custom code for that https://dev.exiv2.org/projects/exiv2/wiki/Accessing_preview_images
+if ! curl $INPUT | exiftool -fast2 -b -PreviewImage - | $VIPSTHUMBNAIL; then
 	# On failure, extract thumbnail from file
 	curl $INPUT | $VIPSTHUMBNAIL
-# fi
+fi
