@@ -29,4 +29,4 @@ OUTPUT=$2
 WIDTH=$3
 HEIGHT=$4
 
-curl $INPUT | vipsthumbnail stdin -e sRGB -t --size "${WIDTH}x${HEIGHT}" --smartcrop attention -s 128 -o stdout
+curl $INPUT | vipsthumbnail stdin -e sRGB -t --size "${WIDTH}x${HEIGHT}" --smartcrop attention -s 128 -o $OUTPUT
