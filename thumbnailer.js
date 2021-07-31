@@ -9,33 +9,45 @@ module.exports = function(ipfs) {
     let transformer = sharp()
       .resize(width, height, {
         position: sharp.strategy.attention,
-      })
-      .on('info', function(info) {
-        console.log('Image height is ' + info.height);
       });
 
     return stream.pipe(transformer);
   }
-  function getURL(fsEntry) {
-    return `http://localhost:8080/ipfs/${fsEntry.cid}`;
+  async function getURL(path) {
+    const root = await ipfs.files.stat('/', {hash: true});
+
+    return `http://localhost:8080/ipfs/${root.cid}${path}`
   }
 
   return async function(protocol, cid, width, height) {
     assert.equal(protocol, 'ipfs');
+
+    const path = `/${cid}-${width}-${height}.jpg`
+
+    // If the file already exists, don't generate again
+    ipfs.files.stat(path, {hash: true}).then(function() {
+      // Return existing
+      return getURL(path);
+    }, function (error) {
+      if (error.message != 'file does not exist') {
+        throw error;
+      }
+    });
 
     const input = ipfs.cat(`/${protocol}/${cid}`, {
       timeout: '30000', // 30s timeout
     });
 
     const thumbnail = getThumbnail(input, width, height);
-    const fsEntry = await ipfs.add({
-      path: cid,
-      content: thumbnail,
-    }, {
-      cidVersion: 1,
-      rawLeaves: true,
-    });
 
-    return getURL(fsEntry);
+    await ipfs.files.write(
+      path, thumbnail,
+      {
+        create: true,
+        cidVersion: 1,
+        rawLeaves: true,
+      });
+
+    return getURL(path);
   }
 };
