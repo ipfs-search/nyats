@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 #
 # Create thumbnails for images and vector files, supporting streaming over HTTP, using vips.
 # Generated file will be cropped to fill the exact dimensions specified.
@@ -25,11 +25,10 @@
 
 
 INPUT=$1
-OUTPUT=$2
-WIDTH=$3
-HEIGHT=$4
+WIDTH=$2
+HEIGHT=$3
 
-VIPSTHUMBNAIL="vipsthumbnail stdin -e sRGB -t --size "${WIDTH}x${HEIGHT}" --smartcrop attention -s 128 -o $OUTPUT"
+VIPSTHUMBNAIL="vipsthumbnail stdin -e sRGB -t --size "${WIDTH}x${HEIGHT}" --smartcrop attention -s 128 -o .jpg[optimize_coding,strip]"
 
 # Try to extract EXIF preview, prevent reading entire raw file
 # Note how exiftool is *very slow* and we should really want to do this with exiv2 or something similar.
