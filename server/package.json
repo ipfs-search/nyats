@@ -1,5 +1,5 @@
 {
-  "name": "nyats",
+  "name": "nyats-server",
   "version": "0.1.0",
   "description": "Not Yet Another Thumbnail Service",
   "main": "server.js",
