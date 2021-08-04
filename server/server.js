@@ -3,13 +3,15 @@ const ipfsClient = require('ipfs-http-client');
 const createThumbnailer = require('./thumbnailer');
 
 const app = express();
-const port = 9614;
 
 async function main() {
-  const ipfs = await ipfsClient.create();
+  const NYATS_SERVER_LISTEN = process.env.NYATS_SERVER_LISTEN || 'localhost:9614';
+  const IPFS_API = process.env.IPFS_API || 'http://localhost:5001';
+
+  const ipfs = await ipfsClient.create(IPFS_API);
 
   const version = await ipfs.version()
-  console.log('IPFS Version:', version.version)
+  console.log('IPFS deamon version:', version.version)
 
   const thumbnailer = createThumbnailer(ipfs);
 
@@ -41,7 +43,7 @@ async function main() {
     error(res, 500, err);
   });
 
-  app.listen(port, () => console.log(`nyats server listening on port ${port}!`));
+  app.listen(NYATS_SERVER_LISTEN, () => console.log(`nyats server listening on ${NYATS_SERVER_LISTEN}!`));
 
   // Publish to IPNS every minute, but only if the root was changed
   const root = await ipfs.files.stat('/', {hash: true});
