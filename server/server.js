@@ -4,9 +4,28 @@ const createThumbnailer = require('./thumbnailer');
 
 const app = express();
 
+async function start_root_updater(ipfs, update_interval) {
+  // Publish to IPNS every minute, but only if the root was changed
+  const root = await ipfs.files.stat('/', {hash: true});
+  var rootCidStr = root.cid.toString();
+
+  setInterval(async function() {
+    // Publish to IPNS - normally we only want to do this every few minutes or so - this is a client-side cache.
+    // Don't wait though!
+    const newroot = await ipfs.files.stat('/', {hash: true});
+    const newrootStr = newroot.cid.toString();
+    if (newrootStr != rootCidStr) {
+      console.log('Publishing root to IPNS.');
+      rootCidStr = newrootStr;
+      await ipfs.name.publish(newroot.cid);
+    }
+  }, update_interval);
+}
+
 async function main() {
   const NYATS_SERVER_LISTEN = process.env.NYATS_SERVER_LISTEN || 'localhost:9614';
   const IPFS_API = process.env.IPFS_API || 'http://localhost:5001';
+  const IPNS_UPDATE_INTERVAL = process.env.IPNS_UPDATE_INTERVAL || 60*1000;
 
   const ipfs = await ipfsClient.create(IPFS_API);
 
@@ -14,6 +33,8 @@ async function main() {
   console.log('IPFS deamon version:', version.version)
 
   const thumbnailer = createThumbnailer(ipfs);
+
+  start_root_updater(ipfs, IPNS_UPDATE_INTERVAL);
 
   app.get('/thumbnail/:protocol/:cid/:width/:height', async (req, res, next) => {
     // TODO: Validation
@@ -44,22 +65,6 @@ async function main() {
   });
 
   app.listen(NYATS_SERVER_LISTEN, () => console.log(`nyats server listening on ${NYATS_SERVER_LISTEN}!`));
-
-  // Publish to IPNS every minute, but only if the root was changed
-  const root = await ipfs.files.stat('/', {hash: true});
-  var rootCidStr = root.cid.toString();
-
-  setInterval(async function() {
-    // Publish to IPNS - normally we only want to do this every few minutes or so - this is a client-side cache.
-    // Don't wait though!
-    const newroot = await ipfs.files.stat('/', {hash: true});
-    const newrootStr = newroot.cid.toString();
-    if (newrootStr != rootCidStr) {
-      console.log('Publishing root to IPNS.');
-      rootCidStr = newrootStr;
-      await ipfs.name.publish(newroot.cid);
-    }
-  }, 60000);
 }
 
 main()
