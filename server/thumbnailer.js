@@ -2,7 +2,7 @@ const assert = require('assert').strict;
 const sharp = require('sharp');
 const asyncIteratorToStream = require("async-iterator-to-stream");
 
-module.exports = function(ipfs) {
+module.exports = function(ipfs, ipfs_gateway) {
   function getThumbnail(source, width, height) {
     const stream = asyncIteratorToStream(source);
 
@@ -17,7 +17,7 @@ module.exports = function(ipfs) {
   async function getURL(root, path) {
     console.debug(`MFS root: ${root.cid}`);
 
-    return `http://localhost:8080/ipfs/${root.cid}${path}`
+    return `${ipfs_gateway}/ipfs/${root.cid}${path}`
   }
 
   return async function(protocol, cid, width, height) {

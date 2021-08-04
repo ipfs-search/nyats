@@ -25,6 +25,7 @@ async function start_root_updater(ipfs, update_interval) {
 async function main() {
   const NYATS_SERVER_LISTEN = process.env.NYATS_SERVER_LISTEN || 'localhost:9614';
   const IPFS_API = process.env.IPFS_API || 'http://localhost:5001';
+  const IPFS_GATEWAY = process.env.IPFS_GATEWAY || 'https://gateway.ipfs.io';
   const IPNS_UPDATE_INTERVAL = process.env.IPNS_UPDATE_INTERVAL || 60*1000;
 
   const ipfs = await ipfsClient.create(IPFS_API);
@@ -32,7 +33,7 @@ async function main() {
   const version = await ipfs.version()
   console.log('IPFS deamon version:', version.version)
 
-  const thumbnailer = createThumbnailer(ipfs);
+  const thumbnailer = createThumbnailer(ipfs, IPFS_GATEWAY);
 
   start_root_updater(ipfs, IPNS_UPDATE_INTERVAL);
 
