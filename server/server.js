@@ -23,7 +23,7 @@ async function start_root_updater(ipfs, update_interval) {
 }
 
 async function main() {
-  const NYATS_SERVER_LISTEN = process.env.NYATS_SERVER_LISTEN || 'localhost:9614';
+  const NYATS_SERVER_PORT = process.env.NYATS_SERVER_PORT || '9614';
   const IPFS_API = process.env.IPFS_API || 'http://localhost:5001';
   const IPFS_GATEWAY = process.env.IPFS_GATEWAY || 'https://gateway.ipfs.io';
   const IPNS_UPDATE_INTERVAL = process.env.IPNS_UPDATE_INTERVAL || 60*1000;
@@ -65,7 +65,7 @@ async function main() {
     error(res, 500, err);
   });
 
-  app.listen(NYATS_SERVER_LISTEN, () => console.log(`nyats server listening on ${NYATS_SERVER_LISTEN}!`));
+  app.listen(NYATS_SERVER_PORT, () => console.log(`nyats server listening on http://localhost:${NYATS_SERVER_PORT}`));
 }
 
 main()
