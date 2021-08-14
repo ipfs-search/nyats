@@ -6,10 +6,6 @@ module.exports = {
     node: true,
   },
   extends: 'defaults/configurations/airbnb/es6',
-  // required to lint *.vue files
-  plugins: [
-    'html'
-  ],
   // add your custom rules here
   'rules': {
     // allow debugger during development

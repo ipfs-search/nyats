@@ -24,7 +24,9 @@
   },
   "homepage": "https://github.com/ipfs-search/nyats#readme",
   "devDependencies": {
+    "babel-eslint": "^10.1.0",
     "eslint": "^7.32.0",
+    "eslint-config-airbnb": "^18.2.1",
     "eslint-config-defaults": "^9.0.0"
   },
   "dependencies": {
