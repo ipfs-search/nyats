@@ -1,6 +1,7 @@
 const express = require('express');
 const ipfsClient = require('ipfs-http-client');
 const createThumbnailer = require('./thumbnailer');
+const debug = require('debug')('nyats');
 
 const app = express();
 
@@ -15,7 +16,7 @@ async function start_root_updater(ipfs, update_interval) {
     const newroot = await ipfs.files.stat('/', {hash: true});
     const newrootStr = newroot.cid.toString();
     if (newrootStr != rootCidStr) {
-      console.log('Publishing root to IPNS.');
+      debug('Publishing new root ${newrootStr} to IPNS.');
       rootCidStr = newrootStr;
       await ipfs.name.publish(newroot.cid);
     }
@@ -25,23 +26,26 @@ async function start_root_updater(ipfs, update_interval) {
 async function main() {
   const NYATS_SERVER_PORT = process.env.NYATS_SERVER_PORT || '9614';
   const IPFS_API = process.env.IPFS_API || 'http://localhost:5001';
-  const IPFS_GATEWAY = process.env.IPFS_GATEWAY || 'https://gateway.ipfs.io';
-  const IPNS_UPDATE_INTERVAL = process.env.IPNS_UPDATE_INTERVAL || 60*1000;
+  const ipfsGateway = process.env.IPFS_GATEWAY || 'https://gateway.ipfs.io';
+  const ipfsTimeout = process.env.IPFS_TIMEOUT || 5000;
+  const IPNS_UPDATE_INTERVAL = process.env.IPNS_UPDATE_INTERVAL || 60 * 1000;
 
   const ipfs = await ipfsClient.create(IPFS_API);
 
-  const version = await ipfs.version()
-  console.log('IPFS deamon version:', version.version)
+  const version = await ipfs.version();
+  console.log('IPFS deamon version:', version.version);
 
-  const thumbnailer = createThumbnailer(ipfs, IPFS_GATEWAY);
+  const thumbnailer = createThumbnailer(ipfs, { ipfsGateway, ipfsTimeout });
 
   start_root_updater(ipfs, IPNS_UPDATE_INTERVAL);
 
-  app.get('/thumbnail/:protocol/:cid/:width/:height', async (req, res, next) => {
+  app.get('/thumbnail/:protocol/:cid/:width/:height', async (req, res) => {
     // TODO: Validation
     // https://express-validator.github.io/docs/
     const { protocol, cid, width, height } = req.params;
     const url = await thumbnailer(protocol, cid, parseInt(width), parseInt(height));
+
+    // TODO: 301 status code (first parameter)
     res.redirect(url);
   });
 
