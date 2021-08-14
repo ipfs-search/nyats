@@ -5,22 +5,22 @@ const debug = require('debug')('nyats');
 
 const app = express();
 
-async function start_root_updater(ipfs, update_interval) {
+async function start_root_updater(ipfs, updateInterval) {
   // Publish to IPNS every minute, but only if the root was changed
-  const root = await ipfs.files.stat('/', {hash: true});
+  const root = await ipfs.files.stat('/', { hash: true });
   var rootCidStr = root.cid.toString();
 
-  setInterval(async function() {
-    // Publish to IPNS - normally we only want to do this every few minutes or so - this is a client-side cache.
-    // Don't wait though!
+  setInterval(async () => {
+    // Publish to IPNS - normally we only want to do this every few minutes or so,
+    // this is a client-side cache. Don't wait though!
     const newroot = await ipfs.files.stat('/', {hash: true});
     const newrootStr = newroot.cid.toString();
-    if (newrootStr != rootCidStr) {
+    if (newrootStr !== rootCidStr) {
       debug('Publishing new root ${newrootStr} to IPNS.');
       rootCidStr = newrootStr;
       await ipfs.name.publish(newroot.cid);
     }
-  }, update_interval);
+  }, updateInterval);
 }
 
 async function main() {
@@ -39,30 +39,42 @@ async function main() {
 
   start_root_updater(ipfs, IPNS_UPDATE_INTERVAL);
 
-  app.get('/thumbnail/:protocol/:cid/:width/:height', async (req, res) => {
+  app.get('/thumbnail/:protocol/:cid/:width/:height', async (req, res, next) => {
     // TODO: Validation
     // https://express-validator.github.io/docs/
     const { protocol, cid, width, height } = req.params;
-    const url = await thumbnailer(protocol, cid, parseInt(width), parseInt(height));
-
-    // TODO: 301 status code (first parameter)
-    res.redirect(url);
+    try {
+      const url = await thumbnailer(protocol, cid, parseInt(width), parseInt(height));
+      // TODO: 301 status code (first parameter)
+      res.redirect(url);
+    } catch (e) {
+      // ExpressJS <5 doesn't properly catch async errors (yet)
+      next(e);
+    }
   });
 
   function error(res, code, err) {
     console.error(`${code}: ${err}`);
     console.trace(err);
 
-    res.json({ error: `${err}` }).status(code).end();
+    res.status(code).json({ error: `${err}` }).end();
   }
 
-  app.use(function (err, req, res, next) {
+  process.on('uncaughtException', (err) => {
+    // This is to prevent the server from crashing on timeout.
+    // Somehow IPFS errors seem to both result in a rejected promise as well as thrown.
+    // Results from here: https://github.com/ipfs/js-ipfs/blob/master/packages/ipfs-core-utils/src/with-timeout-option.js
+    if (err.name === 'TimeoutError') return;
+  });
+
+  app.use((err, req, res, next) => {
     if (process.env.NODE_ENV === 'production') {
       // Don't leak details in production
       error(res, 500, 'Internal Server Error');
     }
 
     if (res.headersSent) {
+      console.log('headers already sent');
       return next(err);
     }
 
@@ -72,4 +84,4 @@ async function main() {
   app.listen(NYATS_SERVER_PORT, () => console.log(`nyats server listening on http://localhost:${NYATS_SERVER_PORT}`));
 }
 
-main()
+main();

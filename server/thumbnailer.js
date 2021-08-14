@@ -4,17 +4,6 @@ const asyncIteratorToStream = require('async-iterator-to-stream');
 const debug = require('debug')('nyats');
 const { AbortController } = require('node-abort-controller');
 
-function timeout_signal(timeout) {
-  const controller = new AbortController();
-
-  setTimeout(() => {
-    debug('Timeout');
-    controller.abort();
-  }, timeout);
-
-  return controller.signal;
-}
-
 module.exports = (ipfs,
   {
     ipfsGateway = 'https://gateway.ipfs.io',
@@ -32,7 +21,7 @@ module.exports = (ipfs,
   }
 
   async function getURL(root, path) {
-    return `${ipfsGateway}/ipfs/${root.cid}${path}`;
+    return `${ipfsGateway}/ipfs/${root}${path}`;
   }
 
   return async (protocol, cid, width, height) => {
@@ -48,7 +37,7 @@ module.exports = (ipfs,
       const root = await ipfs.files.stat('/', { hash: true });
 
       debug(`Returning existing thumbnail for ${path}`);
-      return getURL(root, path);
+      return getURL(root.cid, path);
     } catch (error) {
       debug(`MFS result: ${error}`);
 
@@ -62,33 +51,34 @@ module.exports = (ipfs,
 
     debug(`Retreiving ${cid} from IPFS`);
 
-    try {
-      const input = ipfs.cat(`/${protocol}/${cid}`, {
-        signal: timeout_signal(ipfsTimeout),
-      });
+    const input = ipfs.cat(`/${protocol}/${cid}`, {
+      timeout: ipfsTimeout,
+    });
 
-      debug(`Generating ${width}x${height} thumbnail for ${cid}`);
-      const thumbnail = getThumbnail(input, width, height);
+    debug(`Generating ${width}x${height} thumbnail for ${cid}`);
+    const thumbnail = getThumbnail(input, width, height);
 
-      // Write thumbnail to IPFS
-      debug(`Writing thumbnail to ${path}`);
-      await ipfs.files.write(
-        path, thumbnail,
-        {
-          create: true,
-          cidVersion: 1,
-          rawLeaves: true,
-          flush: true,
-        });
-    } catch (error) {
-      console.log('Caught timeout', error.name);
-      console.log(error);
-      // if (error.message == )
+    debug(`Writing thumbmail for ${cid} to IPFS`);
+    // We separate this from write
+
+    const ipfsThumbnail = await ipfs.add(thumbnail, {
+      cidVersion: 1,
+      rawLeaves: true,
+      timeout: ipfsTimeout,
+    });
+
+    if (ipfsThumbnail['size'] === 0) {
+      throw Error('invalid thumbnail generated: 0 bytes length');
     }
+
+    debug(`Adding thumbnail ${ipfsThumbnail.cid} to ${path}`);
+    ipfs.files.cp(
+      ipfsThumbnail.cid, path, { flush: false }
+    );
 
     // Return URL of thumbnail
     debug(`Returning URL for ${path}`);
-    const root = await ipfs.files.stat('/', { hash: true });
-    return getURL(root, path);
+    const rootCid = await ipfs.files.flush('/');
+    return getURL(rootCid, path);
   };
 };
