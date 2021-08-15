@@ -1,4 +1,4 @@
-const prism = require('prism-media');
+const { Converter } = require("ffmpeg-stream")
 const debug = require('debug')('nyats:video_thumbnailer');
 
 module.exports = () => {
@@ -15,32 +15,27 @@ module.exports = () => {
   //   ]
   // });
 
-  const ffmpeg = prism.FFmpeg.getInfo();
-  debug(`Using FFmpeg version ${ffmpeg.version}`);
-
   return {
-    makeThumbnail(stream, width, height) {
-      console.log('testyeah');
+    async makeThumbnail(stream, width, height) {
+      const converter = new Converter();
+
       //Extract first 40% scene change on a vframe (full frame), minimum 3s after start of video.
-      const keyFrameExtractor = new prism.FFmpeg({
-        args: [
-          '-ss', '3',
-          '-vf',`"select=gt(scene\,0.4), scale=${width}:${height}:force_original_aspect_ratio=increase,crop=${width}:${height}`,
-          '-frames:v', '1',
-          '-vsync', 'vfr',
-          '-f', 'singlejpeg',
-          '-loglevel', '0',
-        ]
+      const inputStream = converter.createInputStream();
+
+      const outputStream = converter.createOutputStream({
+        ss: '3',
+        vf: `"select=gt(scene\,0.4), scale=${width}:${height}:force_original_aspect_ratio=increase,crop=${width}:${height}`,
+        'frames:v': '1',
+        'vsync': 'vfr',
+        'f': 'singlejpeg',
       });
 
-      return stream.pipe(keyFrameExtractor, (err) => {
-        if (err) {
-          console.error('Pipeline failed.', err);
-        } else {
-          console.log('Pipeline succeeded.');
-        }
-      });
-      // return stream;
+      inputStream.pipe(stream);
+
+      debug('starting frame extraction');
+      converter.run();
+
+      return outputStream;
     }
   };
 }

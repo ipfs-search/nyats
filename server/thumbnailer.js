@@ -71,9 +71,8 @@ module.exports = (ipfs,
 
     const thumbnail = getThumbnail(type, stream, width, height);
 
+    // We separate writing from MFS updates
     debug(`Writing thumbmail for ${cid} to IPFS`);
-    // We separate this from write
-
     const ipfsThumbnail = await ipfs.add(thumbnail, {
       cidVersion: 1,
       rawLeaves: true,
@@ -84,6 +83,8 @@ module.exports = (ipfs,
       throw Error('invalid thumbnail generated: 0 bytes length');
     }
 
+    // TODO: Soft fail here
+    // Ref: HTTPError: cp: cannot put node in path /QmWR97DZDJSxQUjKx7EYBhsDWriweYSiM2t1ngPSkZ9HnM-161-90.jpg: directory already has entry by that name
     debug(`Adding thumbnail ${ipfsThumbnail.cid} to ${path}`);
     ipfs.files.cp(
       ipfsThumbnail.cid, path, { flush: false }
