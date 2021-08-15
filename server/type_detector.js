@@ -1,6 +1,6 @@
 const magic = require('stream-mmmagic');
 const micromatch = require('micromatch');
-const debug = require('debug')('nyats');
+const debug = require('debug')('nyats:type_detector');
 
 const mimeTypes = {
   text: [

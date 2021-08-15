@@ -1,6 +1,6 @@
 const assert = require('assert').strict;
 const asyncIteratorToStream = require('async-iterator-to-stream');
-const debug = require('debug')('nyats');
+const debug = require('debug')('nyats:thumbnailer');
 const makeTypeDetector = require('./type_detector');
 const makeImageThumbnailer = require('./image_thumbnailer');
 const makeVideoThumbnailer = require('./video_thumbnailer');
@@ -67,7 +67,7 @@ module.exports = (ipfs,
     let stream = asyncIteratorToStream(input);
 
     [type, stream] = await typeDetector.detectType(stream);
-    console.log(`Detected type: ${type}`);
+    debug(`Detected type: ${type}`);
 
     const thumbnail = getThumbnail(type, stream, width, height);
 

@@ -1,7 +1,7 @@
 const express = require('express');
 const ipfsClient = require('ipfs-http-client');
 const createThumbnailer = require('./thumbnailer');
-const debug = require('debug')('nyats');
+const debug = require('debug')('nyats:server');
 
 const app = express();
 
@@ -27,7 +27,7 @@ async function main() {
   const NYATS_SERVER_PORT = process.env.NYATS_SERVER_PORT || '9614';
   const IPFS_API = process.env.IPFS_API || 'http://localhost:5001';
   const ipfsGateway = process.env.IPFS_GATEWAY || 'https://gateway.ipfs.io';
-  const ipfsTimeout = process.env.IPFS_TIMEOUT || 30000;
+  const ipfsTimeout = process.env.IPFS_TIMEOUT || 60000;
   const IPNS_UPDATE_INTERVAL = process.env.IPNS_UPDATE_INTERVAL || 10 * 1000;
 
   const ipfs = await ipfsClient.create(IPFS_API);
