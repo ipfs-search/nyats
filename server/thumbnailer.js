@@ -9,6 +9,7 @@ module.exports = (ipfs,
     ipfsGateway = 'https://gateway.ipfs.io',
     ipfsTimeout = 10000,
   }) => {
+
   function getThumbnail(source, width, height) {
     const stream = asyncIteratorToStream(source);
 
@@ -54,7 +55,7 @@ module.exports = (ipfs,
 
     debug(`Retreiving ${cid} from IPFS`);
 
-    const input = ipfs.cat(`/${protocol}/${cid}`, {
+    const input = await ipfs.cat(`/${protocol}/${cid}`, {
       timeout: ipfsTimeout,
     });
 
