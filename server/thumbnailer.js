@@ -22,12 +22,11 @@ module.exports = (ipfs,
   async function getThumbnail(protocol, cid, width, height) {
     debug(`Retreiving ${cid} from IPFS`);
 
-    const input = ipfs.cat(`/${protocol}/${cid}`, {
+    const input = await ipfs.cat(`/${protocol}/${cid}`, {
       timeout: ipfsTimeout,
     });
 
     let stream = asyncIteratorToStream(input);
-
     [type, stream] = await typeDetector.detectType(stream);
     debug(`Detected type: ${type}`);
 
@@ -69,31 +68,35 @@ module.exports = (ipfs,
       }
     }
 
-    const thumbnail = await getThumbnail(protocol, cid, width, height);
-    console.log(thumbnail);
+    try {
+      // Try because uncaught promise exception weirdness.
+      const thumbnail = await getThumbnail(protocol, cid, width, height);
 
-    // We separate writing from MFS updates
-    debug(`Writing thumbmail for ${cid} to IPFS`);
-    const ipfsThumbnail = await ipfs.add(thumbnail, {
-      cidVersion: 1,
-      rawLeaves: true,
-      timeout: ipfsTimeout,
-    });
+      // We separate writing from MFS updates
+      debug(`Writing thumbmail for ${cid} to IPFS`);
+      const ipfsThumbnail = await ipfs.add(thumbnail, {
+        cidVersion: 1,
+        rawLeaves: true,
+        timeout: ipfsTimeout,
+      });
 
-    if (ipfsThumbnail['size'] === 0) {
-      throw Error('invalid thumbnail generated: 0 bytes length');
+      if (ipfsThumbnail['size'] === 0) {
+        throw Error('invalid thumbnail generated: 0 bytes length');
+      }
+
+      // TODO: Soft fail here
+      // Ref: HTTPError: cp: cannot put node in path /QmWR97DZDJSxQUjKx7EYBhsDWriweYSiM2t1ngPSkZ9HnM-161-90.jpg: directory already has entry by that name
+      debug(`Adding thumbnail ${ipfsThumbnail.cid} to ${path}`);
+      ipfs.files.cp(
+        ipfsThumbnail.cid, path, { flush: false }
+      );
+
+      // Return URL of thumbnail
+      debug(`Returning URL for ${path}`);
+      const rootCid = await ipfs.files.flush('/');
+      return getURL(rootCid, path);
+    } catch (e) {
+      throw(e);
     }
-
-    // TODO: Soft fail here
-    // Ref: HTTPError: cp: cannot put node in path /QmWR97DZDJSxQUjKx7EYBhsDWriweYSiM2t1ngPSkZ9HnM-161-90.jpg: directory already has entry by that name
-    debug(`Adding thumbnail ${ipfsThumbnail.cid} to ${path}`);
-    ipfs.files.cp(
-      ipfsThumbnail.cid, path, { flush: false }
-    );
-
-    // Return URL of thumbnail
-    debug(`Returning URL for ${path}`);
-    const rootCid = await ipfs.files.flush('/');
-    return getURL(rootCid, path);
   };
 };

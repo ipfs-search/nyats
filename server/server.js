@@ -28,7 +28,7 @@ async function main() {
   const IPFS_API = process.env.IPFS_API || 'http://localhost:5001';
   const ipfsGateway = process.env.IPFS_GATEWAY || 'https://gateway.ipfs.io';
   const ipfsTimeout = process.env.IPFS_TIMEOUT || 30000;
-  const IPNS_UPDATE_INTERVAL = process.env.IPNS_UPDATE_INTERVAL || 10 * 1000;
+  const IPNS_UPDATE_INTERVAL = process.env.IPNS_UPDATE_INTERVAL || 60 * 1000;
 
   const ipfs = await ipfsClient.create(IPFS_API);
 
@@ -47,7 +47,7 @@ async function main() {
     try {
       const url = await thumbnailer(protocol, cid, parseInt(width), parseInt(height));
       // TODO: 301 status code (first parameter)
-      res.redirect(url);
+      res.redirect(301, url);
     } catch (e) {
       // ExpressJS <5 doesn't properly catch async errors (yet)
       next(e);

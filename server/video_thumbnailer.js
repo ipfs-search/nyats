@@ -15,9 +15,6 @@ module.exports = () => {
   //     '-ac', '2',
   //   ]
   // });
-
-
-
   return {
     makeThumbnail(url, width, height) {
       //Extract first 40% scene change on a vframe (full frame), minimum 3s after start of video.
@@ -26,14 +23,14 @@ module.exports = () => {
         'ffmpeg',
         [
           // '-f', 'matroska', // ffmpeg's type detection seems to work 'fine'
-          // '-ss', '1', // skip first second - disable for now, many short videos
+          '-ss', '1', // skip first second
           '-i', `async:${url}`,
           '-vf', `scale=${width}:${height}:force_original_aspect_ratio=increase,crop=${width}:${height}`,
           '-frames:v', '1',
           '-vsync', 'vfr',
           '-f', 'singlejpeg',
           '-',
-          '-loglevel', 'verbose',
+          '-loglevel', 'info',
           '-hide_banner',
         ]
       )
