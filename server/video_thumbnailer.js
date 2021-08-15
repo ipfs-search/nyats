@@ -1,11 +1,6 @@
-const ffmpegBin = require("ffmpeg-static");
-const { FFmpeggy } = require("ffmpeggy");
+const assert = require('assert').strict;
+const { spawn } = require('child_process');
 const debug = require('debug')('nyats:video_thumbnailer');
-
-FFmpeggy.DefaultConfig = {
-  ...FFmpeggy.DefaultConfig,
-  ffmpegBin,
-};
 
 module.exports = () => {
   // # Try extractig cover art (allow only streams which are attached pictures, video thumbnails or cover arts).
@@ -21,25 +16,35 @@ module.exports = () => {
   //   ]
   // });
 
-  return {
-    async makeThumbnail(stream, width, height) {
-      //Extract first 40% scene change on a vframe (full frame), minimum 3s after start of video.
-      const keyFrameExtractor = new FFmpeggy({
-        autorun: true,
-        pipe: true, // shorthand for output set to pipe:0
-        inputOptions: [
-          '-f matroska',
-          '-ss 3',
-        ],
-        outputOptions: [
-          `-vf "select=gt(scene\,0.4), scale=${width}:${height}:force_original_aspect_ratio=increase,crop=${width}:${height}`,
-          '-frames:v 1',
-          '-vsync vfr',
-          '-f singlejpeg',
-        ],
-      }).toStream();
 
-      return keyFrameExtractor.pipe(stream);
+
+  return {
+    makeThumbnail(stream, width, height) {
+      //Extract first 40% scene change on a vframe (full frame), minimum 3s after start of video.
+
+      const ffmpeg = spawn(
+        'ffmpeg',
+        [
+          '-f', 'mp4',
+          '-ss', '3',
+          '-i', '-',
+          '-vf', `select=gt(scene,0.4), scale=${width}:${height}:force_original_aspect_ratio=increase,crop=${width}:${height}`,
+          '-frames:v', '1',
+          '-vsync', 'vfr',
+          '-f', 'singlejpeg',
+          '-',
+          '-loglevel', 'debug',
+        ],
+      )
+
+      // Setup plumbing
+      stream.pipe(ffmpeg.stdin);
+      ffmpeg.stderr.on('data', (data) => {
+        debug(data.toString('utf8'));
+      });
+
+      assert.notEqual(ffmpeg.stdout, null);
+      return ffmpeg.stdout;
     }
   };
 }

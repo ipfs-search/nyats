@@ -71,6 +71,8 @@ module.exports = (ipfs,
 
     const thumbnail = getThumbnail(type, stream, width, height);
 
+    debug(thumbnail);
+
     // We separate writing from MFS updates
     debug(`Writing thumbmail for ${cid} to IPFS`);
     const ipfsThumbnail = await ipfs.add(thumbnail, {
