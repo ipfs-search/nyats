@@ -19,45 +19,30 @@ module.exports = () => {
 
 
   return {
-    async makeThumbnail(url, width, height) {
+    makeThumbnail(url, width, height) {
       //Extract first 40% scene change on a vframe (full frame), minimum 3s after start of video.
 
       const ffmpeg = spawn(
         'ffmpeg',
         [
-          '-f', 'mp4',
-          '-ss', '3',
+          // '-f', 'matroska', // ffmpeg's type detection seems to work 'fine'
+          // '-ss', '1', // skip first second - disable for now, many short videos
           '-i', `async:${url}`,
-          '-vf', `select=gt(scene\\,0.4), scale=${width}:${height}:force_original_aspect_ratio=increase,crop=${width}:${height}`,
+          '-vf', `scale=${width}:${height}:force_original_aspect_ratio=increase,crop=${width}:${height}`,
           '-frames:v', '1',
           '-vsync', 'vfr',
           '-f', 'singlejpeg',
           '-',
-          '-loglevel', 'quiet',
+          '-loglevel', 'verbose',
           '-hide_banner',
         ]
       )
 
-      // Setup plumbing
-      // Piped streaming will lead to FFMPEG reading the entire file. Instead we are using a URL to prevent this.
-      // Only way around it is C-bindings of ffmpeg, like https://github.com/Streampunk/beamcoder
-      // stream.pipe(ffmpeg.stdin);
       ffmpeg.stderr.on('data', (data) => {
         debug(data.toString('utf8'));
       });
 
-      const promise = new Promise((resolve, reject) => {
-        ffmpeg.on('error', (e) => {
-          reject(e);
-        });
-
-        ffmpeg.on('spawn', () => {
-          assert.notEqual(ffmpeg.stdout, null);
-          resolve(ffmpeg.stdout);
-        });
-      });
-
-      return promise;
+      return ffmpeg.stdout;
     }
   };
 }

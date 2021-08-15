@@ -21,6 +21,7 @@ module.exports = (ipfs,
 
   async function getThumbnail(protocol, cid, width, height) {
     debug(`Retreiving ${cid} from IPFS`);
+
     const input = ipfs.cat(`/${protocol}/${cid}`, {
       timeout: ipfsTimeout,
     });
