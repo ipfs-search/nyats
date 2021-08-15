@@ -27,7 +27,7 @@ async function main() {
   const NYATS_SERVER_PORT = process.env.NYATS_SERVER_PORT || '9614';
   const IPFS_API = process.env.IPFS_API || 'http://localhost:5001';
   const ipfsGateway = process.env.IPFS_GATEWAY || 'https://gateway.ipfs.io';
-  const ipfsTimeout = process.env.IPFS_TIMEOUT || 30000;
+  const ipfsTimeout = process.env.IPFS_TIMEOUT || 30 * 1000;
   const IPNS_UPDATE_INTERVAL = process.env.IPNS_UPDATE_INTERVAL || 60 * 1000;
 
   const ipfs = await ipfsClient.create(IPFS_API);
@@ -39,13 +39,14 @@ async function main() {
 
   start_root_updater(ipfs, IPNS_UPDATE_INTERVAL);
 
-  app.get('/thumbnail/:protocol/:cid/:width/:height', async (req, res, next) => {
-    // TODO: Parameter validation
+  app.get('/thumbnail/:protocol/:cid/:width/:height/', async (req, res, next) => {
+    // TODO: Validation
     // https://express-validator.github.io/docs/
     const { protocol, cid, width, height } = req.params;
+    const { type } = req.query;
 
     try {
-      const url = await thumbnailer(protocol, cid, parseInt(width), parseInt(height));
+      const url = await thumbnailer(protocol, cid, type, parseInt(width), parseInt(height));
       // TODO: 301 status code (first parameter)
       res.redirect(301, url);
     } catch (e) {

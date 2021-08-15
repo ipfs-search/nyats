@@ -19,7 +19,7 @@ module.exports = (ipfs,
     return `${ipfsGateway}/ipfs/${root}${path}`;
   }
 
-  async function getThumbnail(protocol, cid, width, height) {
+  async function getThumbnail(protocol, cid, type, width, height) {
     debug(`Retreiving ${cid} from IPFS`);
 
     const input = await ipfs.cat(`/${protocol}/${cid}`, {
@@ -27,8 +27,13 @@ module.exports = (ipfs,
     });
 
     let stream = asyncIteratorToStream(input);
-    [type, stream] = await typeDetector.detectType(stream);
-    debug(`Detected type: ${type}`);
+
+    if (type !== null) {
+      debug(`Using type hint: ${type}`);
+    } else {
+      [type, stream] = await typeDetector.detectType(stream);
+      debug(`Detected type: ${type}`);
+    }
 
     debug(`Generating ${width}x${height} thumbnail`);
     switch (type) {
@@ -43,7 +48,7 @@ module.exports = (ipfs,
     }
   }
 
-  return async (protocol, cid, width, height) => {
+  return async (protocol, cid, type, width, height) => {
     assert.equal(protocol, 'ipfs');
 
     const path = `/${cid}-${width}-${height}.jpg`;
@@ -70,7 +75,7 @@ module.exports = (ipfs,
 
     try {
       // Try because uncaught promise exception weirdness.
-      const thumbnail = await getThumbnail(protocol, cid, width, height);
+      const thumbnail = await getThumbnail(protocol, cid, type, width, height);
 
       // We separate writing from MFS updates
       debug(`Writing thumbmail for ${cid} to IPFS`);
