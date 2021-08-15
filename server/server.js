@@ -40,9 +40,10 @@ async function main() {
   start_root_updater(ipfs, IPNS_UPDATE_INTERVAL);
 
   app.get('/thumbnail/:protocol/:cid/:width/:height', async (req, res, next) => {
-    // TODO: Validation
+    // TODO: Parameter validation
     // https://express-validator.github.io/docs/
     const { protocol, cid, width, height } = req.params;
+
     try {
       const url = await thumbnailer(protocol, cid, parseInt(width), parseInt(height));
       // TODO: 301 status code (first parameter)

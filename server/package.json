@@ -34,7 +34,9 @@
     "debug": "^4.3.2",
     "express": "^4.17.1",
     "ipfs-http-client": "^51.0.1",
+    "micromatch": "^4.0.4",
     "node-abort-controller": "^3.0.0",
-    "sharp": "^0.28.3"
+    "sharp": "^0.28.3",
+    "stream-mmmagic": "^2.3.0"
   }
 }
