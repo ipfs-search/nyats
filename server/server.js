@@ -15,8 +15,8 @@ async function start_root_updater(ipfs, updateInterval) {
     // this is a client-side cache. Don't wait though!
     const newroot = await ipfs.files.stat('/', {hash: true});
     const newrootStr = newroot.cid.toString();
-    if (newrootStr !== rootCidStr) {
-      debug('Publishing new root ${newrootStr} to IPNS.');
+    if (newrootStr != rootCidStr) {
+      debug(`Publishing new root ${newrootStr} to IPNS.`);
       rootCidStr = newrootStr;
       await ipfs.name.publish(newroot.cid);
     }
@@ -27,8 +27,8 @@ async function main() {
   const NYATS_SERVER_PORT = process.env.NYATS_SERVER_PORT || '9614';
   const IPFS_API = process.env.IPFS_API || 'http://localhost:5001';
   const ipfsGateway = process.env.IPFS_GATEWAY || 'https://gateway.ipfs.io';
-  const ipfsTimeout = process.env.IPFS_TIMEOUT || 5000;
-  const IPNS_UPDATE_INTERVAL = process.env.IPNS_UPDATE_INTERVAL || 60 * 1000;
+  const ipfsTimeout = process.env.IPFS_TIMEOUT || 30000;
+  const IPNS_UPDATE_INTERVAL = process.env.IPNS_UPDATE_INTERVAL || 10 * 1000;
 
   const ipfs = await ipfsClient.create(IPFS_API);
 
