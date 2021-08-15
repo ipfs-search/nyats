@@ -1,8 +1,8 @@
 const assert = require('assert').strict;
-const sharp = require('sharp');
 const asyncIteratorToStream = require('async-iterator-to-stream');
 const debug = require('debug')('nyats');
-const typeDetector = require('./type_detector');
+const makeTypeDetector = require('./type_detector');
+const makeImageThumbnailer = require('./image_thumbnailer');
 
 module.exports = (ipfs,
   {
@@ -10,23 +10,14 @@ module.exports = (ipfs,
     ipfsTimeout = 10000,
   }) => {
 
-  function makeImageThumbnail(stream, width, height) {
-    const transformer = sharp()
-      .resize(width, height, {
-        position: sharp.strategy.attention,
-      })
-      .toFormat('jpeg', {
-        mozjpeg: true,
-      });
-
-    return stream.pipe(transformer);
-  }
+  const typeDetector = makeTypeDetector();
+  const imageThumbnailer = makeImageThumbnailer();
 
   function getThumbnail(type, stream, width, height) {
     debug(`Generating ${width}x${height} thumbnail`);
     switch (type) {
       case 'image':
-          return makeImageThumbnail(stream, width, height);
+          return imageThumbnailer.makeThumbnail(stream, width, height);
         break
       default:
         throw Error(`unsupported type: ${type}`);
@@ -36,8 +27,6 @@ module.exports = (ipfs,
   async function getURL(root, path) {
     return `${ipfsGateway}/ipfs/${root}${path}`;
   }
-
-  const detector = typeDetector();
 
   return async (protocol, cid, width, height) => {
     assert.equal(protocol, 'ipfs');
@@ -72,7 +61,7 @@ module.exports = (ipfs,
 
     let stream = asyncIteratorToStream(input);
 
-    [type, stream] = await detector.detectType(stream);
+    [type, stream] = await typeDetector.detectType(stream);
     console.log(`Detected type: ${type}`);
 
     const thumbnail = getThumbnail(type, stream, width, height);
