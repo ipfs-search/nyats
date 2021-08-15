@@ -13,5 +13,5 @@ module.exports = () => {
 
       return stream.pipe(transformer);
     },
-  }
+  };
 };

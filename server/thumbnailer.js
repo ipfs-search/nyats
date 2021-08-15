@@ -3,6 +3,7 @@ const asyncIteratorToStream = require('async-iterator-to-stream');
 const debug = require('debug')('nyats');
 const makeTypeDetector = require('./type_detector');
 const makeImageThumbnailer = require('./image_thumbnailer');
+const makeVideoThumbnailer = require('./video_thumbnailer');
 
 module.exports = (ipfs,
   {
@@ -12,13 +13,17 @@ module.exports = (ipfs,
 
   const typeDetector = makeTypeDetector();
   const imageThumbnailer = makeImageThumbnailer();
+  const videoThumbnailer = makeVideoThumbnailer();
 
   function getThumbnail(type, stream, width, height) {
     debug(`Generating ${width}x${height} thumbnail`);
     switch (type) {
       case 'image':
-          return imageThumbnailer.makeThumbnail(stream, width, height);
-        break
+        return imageThumbnailer.makeThumbnail(stream, width, height);
+
+      case 'video':
+        return videoThumbnailer.makeThumbnail(stream, width, height);
+
       default:
         throw Error(`unsupported type: ${type}`);
     }
