@@ -60,7 +60,7 @@ module.exports = (ipfs,
 
     debug(`Retreiving ${cid} from IPFS`);
 
-    const input = await ipfs.cat(`/${protocol}/${cid}`, {
+    const input = ipfs.cat(`/${protocol}/${cid}`, {
       timeout: ipfsTimeout,
     });
 

@@ -1,5 +1,11 @@
-const { Converter } = require("ffmpeg-stream")
+const ffmpegBin = require("ffmpeg-static");
+const { FFmpeggy } = require("ffmpeggy");
 const debug = require('debug')('nyats:video_thumbnailer');
+
+FFmpeggy.DefaultConfig = {
+  ...FFmpeggy.DefaultConfig,
+  ffmpegBin,
+};
 
 module.exports = () => {
   // # Try extractig cover art (allow only streams which are attached pictures, video thumbnails or cover arts).
@@ -17,25 +23,23 @@ module.exports = () => {
 
   return {
     async makeThumbnail(stream, width, height) {
-      const converter = new Converter();
-
       //Extract first 40% scene change on a vframe (full frame), minimum 3s after start of video.
-      const inputStream = converter.createInputStream();
+      const keyFrameExtractor = new FFmpeggy({
+        autorun: true,
+        pipe: true, // shorthand for output set to pipe:0
+        inputOptions: [
+          '-f matroska',
+          '-ss 3',
+        ],
+        outputOptions: [
+          `-vf "select=gt(scene\,0.4), scale=${width}:${height}:force_original_aspect_ratio=increase,crop=${width}:${height}`,
+          '-frames:v 1',
+          '-vsync vfr',
+          '-f singlejpeg',
+        ],
+      }).toStream();
 
-      const outputStream = converter.createOutputStream({
-        ss: '3',
-        vf: `"select=gt(scene\,0.4), scale=${width}:${height}:force_original_aspect_ratio=increase,crop=${width}:${height}`,
-        'frames:v': '1',
-        'vsync': 'vfr',
-        'f': 'singlejpeg',
-      });
-
-      inputStream.pipe(stream);
-
-      debug('starting frame extraction');
-      converter.run();
-
-      return outputStream;
+      return keyFrameExtractor.pipe(stream);
     }
   };
 }
