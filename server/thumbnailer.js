@@ -2,7 +2,6 @@ const assert = require('assert').strict;
 const sharp = require('sharp');
 const asyncIteratorToStream = require('async-iterator-to-stream');
 const debug = require('debug')('nyats');
-const { AbortController } = require('node-abort-controller');
 
 module.exports = (ipfs,
   {
