@@ -15,22 +15,32 @@ module.exports = (ipfs,
   const imageThumbnailer = makeImageThumbnailer();
   const videoThumbnailer = makeVideoThumbnailer();
 
-  function getThumbnail(type, stream, width, height) {
+  async function getURL(root, path) {
+    return `${ipfsGateway}/ipfs/${root}${path}`;
+  }
+
+  async function getThumbnail(protocol, cid, width, height) {
+    debug(`Retreiving ${cid} from IPFS`);
+    const input = ipfs.cat(`/${protocol}/${cid}`, {
+      timeout: ipfsTimeout,
+    });
+
+    let stream = asyncIteratorToStream(input);
+
+    [type, stream] = await typeDetector.detectType(stream);
+    debug(`Detected type: ${type}`);
+
     debug(`Generating ${width}x${height} thumbnail`);
     switch (type) {
       case 'image':
         return imageThumbnailer.makeThumbnail(stream, width, height);
 
       case 'video':
-        return videoThumbnailer.makeThumbnail(stream, width, height);
+        return videoThumbnailer.makeThumbnail(`http://localhost:8080/ipfs/${cid}`, width, height);
 
       default:
         throw Error(`unsupported type: ${type}`);
     }
-  }
-
-  async function getURL(root, path) {
-    return `${ipfsGateway}/ipfs/${root}${path}`;
   }
 
   return async (protocol, cid, width, height) => {
@@ -58,20 +68,8 @@ module.exports = (ipfs,
       }
     }
 
-    debug(`Retreiving ${cid} from IPFS`);
-
-    const input = ipfs.cat(`/${protocol}/${cid}`, {
-      timeout: ipfsTimeout,
-    });
-
-    let stream = asyncIteratorToStream(input);
-
-    [type, stream] = await typeDetector.detectType(stream);
-    debug(`Detected type: ${type}`);
-
-    const thumbnail = getThumbnail(type, stream, width, height);
-
-    debug(thumbnail);
+    const thumbnail = await getThumbnail(protocol, cid, width, height);
+    console.log(thumbnail);
 
     // We separate writing from MFS updates
     debug(`Writing thumbmail for ${cid} to IPFS`);
