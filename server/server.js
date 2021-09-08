@@ -53,6 +53,7 @@ async function main() {
     try {
       const url = await thumbnailer(protocol, cid, type, parseInt(width), parseInt(height));
       // TODO: 301 status code (first parameter)
+      debug(`Redirecting to ${url}`);
       res.redirect(301, url);
     } catch (e) {
       // ExpressJS <5 doesn't properly catch async errors (yet)

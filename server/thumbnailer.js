@@ -28,7 +28,7 @@ module.exports = (ipfs,
     let stream = asyncIteratorToStream(input);
 
     let type;
-    if (typeHint !== null) {
+    if (typeHint) {
       debug(`Using type hint: ${typeHint}`);
       type = typeHint;
     } else {
@@ -42,6 +42,9 @@ module.exports = (ipfs,
         return imageThumbnailer.makeThumbnail(stream, width, height);
 
       case 'video':
+        return videoThumbnailer.makeThumbnail(`http://localhost:8080/ipfs/${cid}`, width, height);
+
+      case 'audio':
         return videoThumbnailer.makeThumbnail(`http://localhost:8080/ipfs/${cid}`, width, height);
 
       default:
