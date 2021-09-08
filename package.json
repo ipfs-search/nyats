@@ -2,9 +2,9 @@
   "name": "nyats-server",
   "version": "0.1.0",
   "description": "Not Yet Another Thumbnail Service",
-  "main": "server.js",
+  "main": "server/server.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "node server/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
