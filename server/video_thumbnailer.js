@@ -1,6 +1,7 @@
 const assert = require('assert').strict;
 const { spawn } = require('child_process');
 const debug = require('debug')('nyats:video_thumbnailer');
+const pathToFfmpeg = require('ffmpeg-static');
 
 module.exports = () => {
   // # Try extractig cover art (allow only streams which are attached pictures, video thumbnails or cover arts).
@@ -20,7 +21,7 @@ module.exports = () => {
       //Extract first 40% scene change on a vframe (full frame), minimum 3s after start of video.
 
       const ffmpeg = spawn(
-        'ffmpeg',
+        pathToFfmpeg,
         [
           // '-f', 'matroska', // ffmpeg's type detection seems to work 'fine'
           '-ss', '1', // skip first second
