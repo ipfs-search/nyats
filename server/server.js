@@ -32,8 +32,13 @@ async function main() {
 
   const ipfs = await ipfsClient.create(IPFS_API);
 
-  const version = await ipfs.version();
-  console.log('IPFS deamon version:', version.version);
+  try {
+    const version = await ipfs.version();
+    console.log('IPFS daemon version:', version.version);
+  } catch (e) {
+    console.log('Unable to get IPFS daemon version. Is the IPFS daemon running?');
+    return;
+  }
 
   const thumbnailer = createThumbnailer(ipfs, { ipfsGateway, ipfsTimeout });
 
