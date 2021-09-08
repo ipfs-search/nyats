@@ -7,13 +7,16 @@ Very much a work in progress.
 
 ## Server
 
-## Usage
+### Dependencies
+
+
+### Usage
 1. Install dependencies: `npm install`
 2. Start local IPFS node
 3. `$ node start`
 4. Open `http://localhost:9614/thumbnail/<cid>/<width>/<height>`, and behold.
 
-## Configuration
+### Configuration
 The API can be configured through the following environment variables:
 - `NYATS_SERVER_PORT` (default: `9614`)
 - `IPFS_API` (default: `http://localhost:5001`)
