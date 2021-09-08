@@ -10,7 +10,6 @@ module.exports = (ipfs,
     ipfsGateway = 'https://gateway.ipfs.io',
     ipfsTimeout = 10000,
   }) => {
-
   const typeDetector = makeTypeDetector();
   const imageThumbnailer = makeImageThumbnailer();
   const videoThumbnailer = makeVideoThumbnailer();
@@ -19,7 +18,7 @@ module.exports = (ipfs,
     return `${ipfsGateway}/ipfs/${root}${path}`;
   }
 
-  async function getThumbnail(protocol, cid, type, width, height) {
+  async function getThumbnail(protocol, cid, typeHint, width, height) {
     debug(`Retreiving ${cid} from IPFS`);
 
     const input = await ipfs.cat(`/${protocol}/${cid}`, {
@@ -28,8 +27,10 @@ module.exports = (ipfs,
 
     let stream = asyncIteratorToStream(input);
 
-    if (type !== null) {
-      debug(`Using type hint: ${type}`);
+    let type;
+    if (typeHint !== null) {
+      debug(`Using type hint: ${typeHint}`);
+      type = typeHint;
     } else {
       [type, stream] = await typeDetector.detectType(stream);
       debug(`Detected type: ${type}`);
@@ -85,7 +86,7 @@ module.exports = (ipfs,
         timeout: ipfsTimeout,
       });
 
-      if (ipfsThumbnail['size'] === 0) {
+      if (ipfsThumbnail.size === 0) {
         throw Error('invalid thumbnail generated: 0 bytes length');
       }
 

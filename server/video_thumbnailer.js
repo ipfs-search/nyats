@@ -1,4 +1,4 @@
-const assert = require('assert').strict;
+// const assert = require('assert').strict;
 const { spawn } = require('child_process');
 const debug = require('debug')('nyats:video_thumbnailer');
 const pathToFfmpeg = require('ffmpeg-static');
@@ -43,4 +43,4 @@ module.exports = () => {
       return ffmpeg.stdout;
     }
   };
-}
+};

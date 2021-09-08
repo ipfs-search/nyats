@@ -42,9 +42,9 @@ const mimeTypes = {
 };
 
 function compileTypeRe() {
-  let typeRe = {};
+  const typeRe = {};
 
-  for (let key of Object.keys(mimeTypes)) {
+  for (const key of Object.keys(mimeTypes)) {
     typeRe[key] = mimeTypes[key].map((m) => micromatch.makeRe(m));
   }
 
@@ -56,11 +56,9 @@ module.exports = () => {
   const typeRe = compileTypeRe();
 
   function typeFromMime(mime) {
-    for (let key of Object.keys(typeRe)) {
+    for (const key of Object.keys(typeRe)) {
       const reLs = typeRe[key];
-      if (reLs.some((re) => {
-          return re.test(mime);
-        })) {
+      if (reLs.some((re) => re.test(mime))) {
         return key;
       }
     }
@@ -70,9 +68,9 @@ module.exports = () => {
 
   return {
     async detectType(input) {
-      const [mime, output] = await magic.promise(input, {peekBytes: 1024});
+      const [mime, output] = await magic.promise(input, { peekBytes: 1024 });
       const type = typeFromMime(mime.type);
       return [type, output];
-    }
+    },
   };
 };

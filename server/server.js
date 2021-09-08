@@ -5,17 +5,17 @@ const debug = require('debug')('nyats:server');
 
 const app = express();
 
-async function start_root_updater(ipfs, updateInterval) {
+async function startRootUpdater(ipfs, updateInterval) {
   // Publish to IPNS every minute, but only if the root was changed
   const root = await ipfs.files.stat('/', { hash: true });
-  var rootCidStr = root.cid.toString();
+  let rootCidStr = root.cid.toString();
 
   setInterval(async () => {
     // Publish to IPNS - normally we only want to do this every few minutes or so,
     // this is a client-side cache. Don't wait though!
-    const newroot = await ipfs.files.stat('/', {hash: true});
+    const newroot = await ipfs.files.stat('/', { hash: true });
     const newrootStr = newroot.cid.toString();
-    if (newrootStr != rootCidStr) {
+    if (newrootStr !== rootCidStr) {
       debug(`Publishing new root ${newrootStr} to IPNS.`);
       rootCidStr = newrootStr;
       await ipfs.name.publish(newroot.cid);
@@ -42,7 +42,7 @@ async function main() {
 
   const thumbnailer = createThumbnailer(ipfs, { ipfsGateway, ipfsTimeout });
 
-  start_root_updater(ipfs, IPNS_UPDATE_INTERVAL);
+  startRootUpdater(ipfs, IPNS_UPDATE_INTERVAL);
 
   app.get('/thumbnail/:protocol/:cid/:width/:height/', async (req, res, next) => {
     // TODO: Validation
