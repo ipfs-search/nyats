@@ -35,6 +35,7 @@ async function main() {
   try {
     const version = await ipfs.version();
     console.log('IPFS daemon version:', version.version);
+    console.log(`IPFS gateway: ${ipfsGateway}`)
   } catch (e) {
     console.log('Unable to get IPFS daemon version. Is the IPFS daemon running?');
     return;
