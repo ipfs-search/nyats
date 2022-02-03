@@ -13,8 +13,8 @@ Very much a work in progress.
 ### Usage
 1. Install dependencies: `npm install`
 2. Start local IPFS node
-3. `$ node start`
-4. Open `http://localhost:9614/thumbnail/<cid>/<width>/<height>`, and behold.
+3. `$ npm start`
+4. Open `http://localhost:9614/thumbnail/ipfs/<cid>/<width>/<height>/`, and behold.
 
 ### Configuration
 The API can be configured through the following environment variables:
