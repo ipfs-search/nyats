@@ -15,11 +15,10 @@ You need a local ipfs node; see: https://docs.ipfs.io/how-to/command-line-quick-
 1. Install dependencies: `npm install`
 2. Start local IPFS node: `ipfs daemon`
 3. `npm start`
-
     Or, to use the local gateway: `IPFS_GATEWAY=http://127.0.0.1:8080 npm start`
 4. Open `http://localhost:9614/thumbnail/<protocol>/<cid>/<width>/<height>`, and behold.
+   Example: http://localhost:9614/thumbnail/ipfs/QmcRD4wkPPi6dig81r5sLj9Zm1gDCL4zgpEj9CfuRrGbzF/200/200
 
-    For example: http://localhost:9614/thumbnail/ipfs/QmcRD4wkPPi6dig81r5sLj9Zm1gDCL4zgpEj9CfuRrGbzF/200/200
 ### Configuration
 The API can be configured through the following environment variables:
 - `NYATS_SERVER_PORT` (default: `9614`)
