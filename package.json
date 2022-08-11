@@ -37,7 +37,7 @@
     "ipfs-http-client": "^51.0.1",
     "micromatch": "^4.0.4",
     "node-abort-controller": "^3.0.0",
-    "sharp": "^0.28.3",
+    "sharp": "^0.30.7",
     "stream-mmmagic": "^2.3.0"
   }
 }
