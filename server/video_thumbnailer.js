@@ -92,6 +92,7 @@ module.exports = () => {
 
   return {
     async makeThumbnail(url, width, height) {
+      debug(`Extracting thumbnail from ${url}`);
       extractors = [extractCoverArt, extractKeyFrame, extractFirstFrame];
 
       for (const extract of extractors) {
