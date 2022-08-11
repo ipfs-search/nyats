@@ -1,4 +1,5 @@
 const express = require('express');
+const assert = require('assert').strict;
 const ipfsClient = require('ipfs-http-client');
 const createThumbnailer = require('./thumbnailer');
 const debug = require('debug')('nyats:server');
@@ -53,7 +54,7 @@ async function main() {
 
     try {
       const url = await thumbnailer(protocol, cid, type, parseInt(width), parseInt(height));
-      // TODO: 301 status code (first parameter)
+      assert(url);
       debug(`Redirecting to ${url}`);
       res.redirect(301, url);
     } catch (e) {
