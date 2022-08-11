@@ -42,8 +42,6 @@ module.exports = (ipfs,
         return imageThumbnailer.makeThumbnail(stream, width, height);
 
       case 'video':
-        return videoThumbnailer.makeThumbnail(`http://localhost:8080/ipfs/${cid}`, width, height);
-
       case 'audio':
         return videoThumbnailer.makeThumbnail(`http://localhost:8080/ipfs/${cid}`, width, height);
 
@@ -96,9 +94,13 @@ module.exports = (ipfs,
       // TODO: Soft fail here
       // Ref: HTTPError: cp: cannot put node in path /QmWR97DZDJSxQUjKx7EYBhsDWriweYSiM2t1ngPSkZ9HnM-161-90.jpg: directory already has entry by that name
       debug(`Adding thumbnail ${ipfsThumbnail.cid} to ${path}`);
-      ipfs.files.cp(
-        ipfsThumbnail.cid, path, { flush: false }
-      );
+      try {
+        ipfs.files.cp(
+          ipfsThumbnail.cid, path, { flush: false }
+        );
+      } catch (error) {
+        console.error("Error adding thumbnail to directory: %o", error);
+      }
 
       // Return URL of thumbnail
       debug(`Returning URL for ${path}`);
