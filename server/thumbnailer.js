@@ -53,7 +53,7 @@ module.exports = (ipfs,
   return async (protocol, cid, type, width, height) => {
     assert.equal(protocol, 'ipfs');
 
-    const path = `/${cid}-${width}-${height}.jpg`;
+    const path = `/${cid}-${width}-${height}.webp`;
 
     // If the file already exists, don't generate again
     try {

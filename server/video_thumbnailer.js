@@ -6,7 +6,7 @@ const pathToFfmpeg = require('ffmpeg-static');
 
 async function ffmpegExtractor(params) {
   const commonParams = [
-    '-f', 'singlejpeg',
+    '-f', 'webp',
     '-',
     '-loglevel', 'info',
     '-hide_banner',
@@ -61,6 +61,11 @@ async function extractKeyFrame(url, width, height) {
       '-vf', vFilter,
       '-frames:v', '1',
       '-vsync', 'vfr',
+
+      // https://superuser.com/a/1704315
+      '-compression_level', '6',
+      '-q:v', '75',
+      '-loop', '0',
     ]
   );
 }
