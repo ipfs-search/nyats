@@ -50,11 +50,7 @@ module.exports = (ipfs,
     }
   }
 
-  return async (protocol, cid, type, width, height) => {
-    assert.equal(protocol, 'ipfs');
-
-    const path = `/${cid}-${width}-${height}.webp`;
-
+  async function getExistingThumbnail(path) {
     // If the file already exists, don't generate again
     try {
       debug(`Checking for ${path} on MFS`);
@@ -62,8 +58,8 @@ module.exports = (ipfs,
       // This might unecessarily cause lag
       const root = await ipfs.files.stat('/', { hash: true });
 
-      debug(`Returning existing thumbnail for ${path}`);
       return getURL(root.cid, path);
+
     } catch (error) {
       debug(`MFS result: ${error}`);
 
@@ -71,43 +67,62 @@ module.exports = (ipfs,
         // Unexpected error.
         throw error;
       } else {
-        debug(`${path} not found on MFS, generating thumbnail`);
+        debug(`${path} not found on MFS`);
+        return null;
       }
     }
+  }
 
-    try {
-      // Try because uncaught promise exception weirdness.
-      const thumbnail = await getThumbnail(protocol, cid, type, width, height);
+  async function writeThumbnail(thumbnail) {
+    debug(`Adding thumbnail to IPFS`);
+    ipfsThumbnail = await ipfs.add(thumbnail, {
+      cidVersion: 1,
+      rawLeaves: true,
+      timeout: ipfsTimeout,
+    });
 
-      // We separate writing from MFS updates
-      debug(`Writing thumbmail for ${cid} to IPFS`);
-      const ipfsThumbnail = await ipfs.add(thumbnail, {
-        cidVersion: 1,
-        rawLeaves: true,
-        timeout: ipfsTimeout,
-      });
-
-      if (ipfsThumbnail.size === 0) {
-        throw Error('invalid thumbnail generated: 0 bytes length');
-      }
-
-      // TODO: Soft fail here
-      // Ref: HTTPError: cp: cannot put node in path /QmWR97DZDJSxQUjKx7EYBhsDWriweYSiM2t1ngPSkZ9HnM-161-90.jpg: directory already has entry by that name
-      debug(`Adding thumbnail ${ipfsThumbnail.cid} to ${path}`);
-      try {
-        ipfs.files.cp(
-          ipfsThumbnail.cid, path, { flush: false }
-        );
-      } catch (error) {
-        console.error("Error adding thumbnail to directory: %o", error);
-      }
-
-      // Return URL of thumbnail
-      debug(`Returning URL for ${path}`);
-      const rootCid = await ipfs.files.flush('/');
-      return getURL(rootCid, path);
-    } catch (e) {
-      throw(e);
+    if (ipfsThumbnail.size === 0) {
+      throw Error('invalid thumbnail generated: 0 bytes length');
     }
+
+    return ipfsThumbnail;
+  }
+
+  async function addToMFS(ipfsThumbnail, path) {
+    // TODO: Soft fail here
+    // Ref: HTTPError: cp: cannot put node in path /QmWR97DZDJSxQUjKx7EYBhsDWriweYSiM2t1ngPSkZ9HnM-161-90.jpg: directory already has entry by that name
+    debug(`Adding thumbnail ${ipfsThumbnail.cid} to ${path}`);
+    return ipfs.files.cp(
+      ipfsThumbnail.cid, path, { flush: false }
+    );
+  }
+
+  async function flushRootCID() {
+    return ipfs.files.flush('/');
+  }
+
+  async function generateThumbnail(path, protocol, cid, type, width, height) {
+    debug(`Generating thumbnail for ${protocol}://${cid} of type ${type} at ${width}x${height}`);
+
+    const thumbnail = await getThumbnail(protocol, cid, type, width, height)
+    const ipfsThumbnail = await writeThumbnail(thumbnail);
+    await addToMFS(ipfsThumbnail, path);
+    const rootCid = await flushRootCID();
+
+    return getURL(rootCid, path);
+  }
+
+  return async (protocol, cid, type, width, height) => {
+    assert.equal(protocol, 'ipfs');
+
+    const path = `/${cid}-${width}-${height}.webp`;
+
+    const existing = await getExistingThumbnail(path)
+    if (existing) {
+      debug(`Returning existing thumbnail: ${existing}`);
+      return existing;
+    }
+
+    return generateThumbnail(path, protocol, cid, type, width, height);
   };
 };
