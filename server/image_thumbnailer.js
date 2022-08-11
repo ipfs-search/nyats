@@ -6,11 +6,11 @@ const white = {r:255, g:255, b:255}; // Default: white background
 function isLossless(metadata) {
   switch (metadata.format) {
     case 'jpeg':
-      return false
+      return false;
     case 'png':
     case 'gif':
     case 'svg':
-      return true
+      return true;
     case 'webp':
       // Consistent with the VP8 bitstream, lossy WebP works exclusively with
       // an 8-bit Y'CbCr 4:2:0 (often called YUV420) image format. Please
@@ -25,14 +25,24 @@ function isLossless(metadata) {
 module.exports = () => {
   return {
     async makeThumbnail(stream, width, height) {
-      const image = sharp();
+      const image = sharp({
+        animated: true,
+        failOn: 'error',
+      });
+      stream.pipe(image);
 
-      const metadata = await image.metadata();
+      const metadata = await image.clone().metadata();
       debug('Got metadata:', metadata);
+
+      const isAnimated = metadata.pages > 1;
 
       const transformer = image
         .resize(width, height, {
-          position: sharp.strategy.attention,
+          // Attention doesn't work for animations
+          position: isAnimated ? sharp.gravity.center : sharp.strategy.attention,
+        })
+        .timeout({
+          seconds: 120
         })
         .webp({
           lossless: isLossless(metadata),
@@ -40,7 +50,7 @@ module.exports = () => {
           delay: metadata.delay,
         });
 
-      return stream.pipe(transformer);
+      return transformer;
     },
   };
 };
