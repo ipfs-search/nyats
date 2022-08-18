@@ -1,0 +1,76 @@
+openapi: 3.0.0
+info:
+  description: |
+    Not Yet Another Thumbnail Service.
+
+    IPFS caching thumbnailer.
+    Generates thumbnails for IPFS CID's, adds them to IPFS node (if
+    not pre-existing) and redirects to IPFS URL, while regularly
+    publishing to IPNS. Soon, we will be able to use IPNS as a
+    cache, so clients will not even need to hit the server.
+  version: '0.9'
+  title: nyats
+  contact:
+    name: ipfs-search.com
+    url: https://ipfs-search.com
+    email: info@ipfs-search.com
+  license:
+    name: AGPL-3.0-or-later
+    url: https://www.gnu.org/licenses/agpl-3.0.en.html
+
+servers:
+  - url: 'https://api.ipfs-search.com/v1'
+    description: Production API.
+  - url: http://localhost:9614
+    description: Default local dev server.
+
+paths:
+  /thumbnail/{protocol}/{cid}/{width}/{height}:
+    get:
+      summary: Redirect to URL of thumbnail for resource.
+      description: |
+        Either returns URL for existing thumbnail or generates one
+        and returns generated URL.
+      operationId: getThumbnail
+      parameters:
+        - in: path
+          name: protocol
+          required: true
+          example: ipfs
+          schema:
+            type: string
+            enum: ["ipfs"]
+        - in: path
+          name: cid
+          example: QmcRD4wkPPi6dig81r5sLj9Zm1gDCL4zgpEj9CfuRrGbzF
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: width
+          required: true
+          example: 640
+          schema:
+            type: integer
+            minimum: 32
+            maximum: 7680 # 8K
+        - in: path
+          name: height
+          required: true
+          example: 480
+          schema:
+            type: integer
+            minimum: 32
+            maximum: 4320 # 8K
+        - in: query
+          name: type
+          required: false
+          description: Mime type. Auto-detected when not specified.
+          schema:
+            type: string
+            example: image/webp
+            default: ''
+      responses:
+        '301':
+          description: Permanent redirect to thumbnail of the exact requested dimensions, in WebP format, served through IPFS.
+
