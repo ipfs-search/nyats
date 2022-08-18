@@ -1,4 +1,5 @@
 const express = require('express');
+const assert = require('assert').strict;
 const ipfsClient = require('ipfs-http-client');
 const createThumbnailer = require('./thumbnailer');
 const debug = require('debug')('nyats:server');
@@ -27,7 +28,7 @@ async function main() {
   const NYATS_SERVER_PORT = process.env.NYATS_SERVER_PORT || '9614';
   const IPFS_API = process.env.IPFS_API || 'http://localhost:5001';
   const ipfsGateway = process.env.IPFS_GATEWAY || 'https://gateway.ipfs.io';
-  const ipfsTimeout = process.env.IPFS_TIMEOUT || 30 * 1000;
+  const ipfsTimeout = process.env.IPFS_TIMEOUT || 120 * 1000;
   const IPNS_UPDATE_INTERVAL = process.env.IPNS_UPDATE_INTERVAL || 60 * 1000;
 
   const ipfs = await ipfsClient.create(IPFS_API);
@@ -53,7 +54,7 @@ async function main() {
 
     try {
       const url = await thumbnailer(protocol, cid, type, parseInt(width), parseInt(height));
-      // TODO: 301 status code (first parameter)
+      assert(url);
       debug(`Redirecting to ${url}`);
       res.redirect(301, url);
     } catch (e) {

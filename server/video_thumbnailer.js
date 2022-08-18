@@ -6,15 +6,12 @@ const pathToFfmpeg = require('ffmpeg-static');
 
 async function ffmpegExtractor(params) {
   const commonParams = [
-    '-f', 'singlejpeg',
+    '-f', 'webp',
     '-',
     '-loglevel', 'info',
     '-hide_banner',
   ];
 
-  // WARN/TODO:
-  // Never pass unsanitized user input to this function. Any input containing shell metacharacters
-  // may be used to trigger arbitrary command execution!!!
   const ffmpeg = spawn(
     pathToFfmpeg,
     params.concat(commonParams),
@@ -39,7 +36,7 @@ function scaleFilter(width, height) {
 async function extractCoverArt(url, width, height) {
   // TODO: Use cover art archive as secondary source.
   // https://coverartarchive.org/release/79de4fa8-102c-402f-8040-3f1aa6d0c1b4/front
-  debug('Try extractig cover art for streams with attached pictures, thumbnails or cover art.');
+  debug('Extract cover art for streams with attached pictures, thumbnails or cover art.');
 
   return ffmpegExtractor(
     [
@@ -64,6 +61,11 @@ async function extractKeyFrame(url, width, height) {
       '-vf', vFilter,
       '-frames:v', '1',
       '-vsync', 'vfr',
+
+      // https://superuser.com/a/1704315
+      '-compression_level', '6',
+      '-q:v', '75',
+      '-loop', '0',
     ]
   );
 }
@@ -90,25 +92,16 @@ module.exports = () => {
 
   return {
     async makeThumbnail(url, width, height) {
-      try {
-        const { stdout } = await extractCoverArt(url, width, height);
-        return stdout;
-      } catch (e) {
-        debug(e);
-      }
+      debug(`Extracting thumbnail from ${url}`);
+      extractors = [extractCoverArt, extractKeyFrame, extractFirstFrame];
 
-      try {
-        const { stdout } = await extractKeyFrame(url, width, height);
-        return stdout;
-      } catch (e) {
-        debug(e);
-      }
-
-      try {
-        const { stdout } = await extractFirstFrame(url, width, height);
-        return stdout;
-      } catch (e) {
-        debug(e);
+      for (const extract of extractors) {
+        try {
+          const { stdout } = await extract(url, width, height);
+          return stdout;
+        } catch (e) {
+          debug(e);
+        }
       }
 
       throw new Error('All thumbnail methods failed.');
