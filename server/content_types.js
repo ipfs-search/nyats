@@ -1,4 +1,4 @@
-module.exports = {
+const types = {
   text: [
     // eBook types
     'application/x-mobipocket-ebook',
@@ -37,3 +37,5 @@ module.exports = {
     'image/*',
   ],
 };
+
+export default types;

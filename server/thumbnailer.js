@@ -1,11 +1,14 @@
-const assert = require('assert').strict;
-const asyncIteratorToStream = require('async-iterator-to-stream');
-const debug = require('debug')('nyats:thumbnailer');
-const makeTypeDetector = require('./type_detector');
-const makeImageThumbnailer = require('./image_thumbnailer');
-const makeVideoThumbnailer = require('./video_thumbnailer');
+import { strict as assert } from 'assert';
+import asyncIteratorToStream from 'async-iterator-to-stream';
+import makeDebugger from 'debug';
 
-module.exports = (ipfs,
+import makeTypeDetector from './type_detector.js';
+import makeImageThumbnailer from './image_thumbnailer.js';
+import makeVideoThumbnailer from './video_thumbnailer.js';
+
+const debug = makeDebugger('nyats:thumbnailer');
+
+export default (ipfs,
   {
     ipfsGateway = 'https://gateway.ipfs.io',
     ipfsTimeout = 10000,

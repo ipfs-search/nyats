@@ -1,9 +1,11 @@
-const express = require('express');
-const assert = require('assert').strict;
-const ipfsClient = require('ipfs-http-client');
-const createThumbnailer = require('./thumbnailer');
-const debug = require('debug')('nyats:server');
+import express from 'express';
+import { strict as assert } from 'assert';
+import { create } from 'ipfs-http-client';
+import makeDebugger from 'debug';
 
+import makeThumbnailer from './thumbnailer.js';
+
+const debug = makeDebugger('nyats:server');
 const app = express();
 
 async function startRootUpdater(ipfs, updateInterval) {
@@ -31,7 +33,7 @@ async function main() {
   const ipfsTimeout = process.env.IPFS_TIMEOUT || 120 * 1000;
   const IPNS_UPDATE_INTERVAL = process.env.IPNS_UPDATE_INTERVAL || 60 * 1000;
 
-  const ipfs = await ipfsClient.create(IPFS_API);
+  const ipfs = create(IPFS_API);
 
   try {
     const version = await ipfs.version();
@@ -42,7 +44,7 @@ async function main() {
     return;
   }
 
-  const thumbnailer = createThumbnailer(ipfs, { ipfsGateway, ipfsTimeout });
+  const thumbnailer = makeThumbnailer(ipfs, { ipfsGateway, ipfsTimeout });
 
   startRootUpdater(ipfs, IPNS_UPDATE_INTERVAL);
 
@@ -77,7 +79,7 @@ async function main() {
     if (err.name === 'TimeoutError') return;
   });
 
-  app.use((err, req, res, next) => {
+  app.use((err, _, res, next) => {
     if (process.env.NODE_ENV === 'production') {
       // Don't leak details in production
       error(res, 500, 'Internal Server Error');

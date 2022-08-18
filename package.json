@@ -17,6 +17,7 @@
     "sharp",
     "vips"
   ],
+  "type": "module",
   "author": "Mathijs de Bruin",
   "license": "AGPL-3.0-or-later",
   "bugs": {
@@ -24,6 +25,11 @@
   },
   "homepage": "https://github.com/ipfs-search/nyats#readme",
   "devDependencies": {
+    "@types/debug": "^4.1.7",
+    "@types/express": "^4.17.13",
+    "@types/ffmpeg-static": "^3.0.1",
+    "@types/micromatch": "^4.0.2",
+    "@types/sharp": "^0.30.5",
     "babel-eslint": "^10.1.0",
     "eslint": "^7.32.0",
     "eslint-config-airbnb": "^18.2.1",

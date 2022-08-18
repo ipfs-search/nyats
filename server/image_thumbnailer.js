@@ -1,7 +1,7 @@
-const debug = require('debug')('nyats:image_thumbnailer');
-const sharp = require('sharp');
+import debuggerFactory from 'debug';
+import sharp from 'sharp';
 
-const white = {r:255, g:255, b:255}; // Default: white background
+const debug = debuggerFactory('nyats:image_thumbnailer');
 
 function isLossless(metadata) {
   switch (metadata.format) {
@@ -18,39 +18,41 @@ function isLossless(metadata) {
       // and Decoding Guide for more detail. Lossless WebP works exclusively
       // with the RGBA format. See the WebP Lossless Bitstream specification.
       // https://developers.google.com/speed/webp/faq
-      return metadata.chromaSubsampling != '4:2:0';
+      return metadata.chromaSubsampling !== '4:2:0';
+    default:
+      throw new Error(`Unexpected format: ${metadata.format}`);
   }
 }
 
-module.exports = () => {
-  return {
-    async makeThumbnail(stream, width, height) {
-      const image = sharp({
-        animated: true,
-        failOn: 'error',
-      });
-      stream.pipe(image);
+async function makeThumbnail(stream, width, height) {
+  const image = sharp({
+    animated: true,
+    failOn: 'error',
+  });
+  stream.pipe(image);
 
-      const metadata = await image.clone().metadata();
-      debug('Got metadata:', metadata);
+  const metadata = await image.clone().metadata();
+  debug('Got metadata:', metadata);
 
-      const isAnimated = metadata.pages > 1;
+  const isAnimated = metadata.pages > 1;
 
-      const transformer = image
-        .resize(width, height, {
-          // Attention doesn't work for animations
-          position: isAnimated ? sharp.gravity.center : sharp.strategy.attention,
-        })
-        .timeout({
-          seconds: 120
-        })
-        .webp({
-          lossless: isLossless(metadata),
-          loop: metadata.loop,
-          delay: metadata.delay,
-        });
+  const transformer = image
+    .resize(width, height, {
+      // Attention doesn't work for animations
+      position: isAnimated ? sharp.gravity.center : sharp.strategy.attention,
+    })
+    .timeout({
+      seconds: 120,
+    })
+    .webp({
+      lossless: isLossless(metadata),
+      loop: metadata.loop,
+      delay: metadata.delay,
+    });
 
-      return transformer;
-    },
-  };
-};
+  return transformer;
+}
+
+export default function thumbnailerFactory() {
+  return makeThumbnail;
+}
