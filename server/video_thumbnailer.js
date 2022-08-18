@@ -1,8 +1,10 @@
-const util = require('util');
-const childProcess = require('child_process');
-const spawn = util.promisify(childProcess.spawn);
-const debug = require('debug')('nyats:video_thumbnailer');
-const pathToFfmpeg = require('ffmpeg-static');
+import { promisify } from 'util';
+import { spawn as _spawn } from 'child_process';
+import makeDebugger from 'debug';
+import pathToFfmpeg from 'ffmpeg-static';
+
+const spawn = promisify(_spawn);
+const debug = makeDebugger('nyats:video_thumbnailer');
 
 async function ffmpegExtractor(params) {
   const commonParams = [
@@ -83,28 +85,22 @@ async function extractFirstFrame(url, width, height) {
   );
 }
 
-function init() {
+async function makeThumbnail(url, width, height) {
+  debug(`Extracting thumbnail from ${url}`);
+  extractors = [extractCoverArt, extractKeyFrame, extractFirstFrame];
 
+  for (const extract of extractors) {
+    try {
+      const { stdout } = await extract(url, width, height);
+      return stdout;
+    } catch (e) {
+      debug(e);
+    }
+  }
+
+  throw new Error('All thumbnail methods failed.');
 }
 
-module.exports = () => {
-  init();
-
-  return {
-    async makeThumbnail(url, width, height) {
-      debug(`Extracting thumbnail from ${url}`);
-      extractors = [extractCoverArt, extractKeyFrame, extractFirstFrame];
-
-      for (const extract of extractors) {
-        try {
-          const { stdout } = await extract(url, width, height);
-          return stdout;
-        } catch (e) {
-          debug(e);
-        }
-      }
-
-      throw new Error('All thumbnail methods failed.');
-    },
-  };
+export default function thumbnailerFactory() {
+  return makeThumbnail;
 };

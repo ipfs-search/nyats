@@ -1,7 +1,6 @@
-const magic = require('stream-mmmagic');
-const micromatch = require('micromatch');
-const debug = require('debug')('nyats:type_detector');
-const contentTypes = require('./content_types');
+import { promise } from 'stream-mmmagic';
+import micromatch from 'micromatch';
+import contentTypes from './content_types.js';
 
 function compileTypeRe() {
   const typeRe = {};
@@ -13,7 +12,7 @@ function compileTypeRe() {
   return typeRe;
 }
 
-module.exports = () => {
+export default () => {
   const typeRe = compileTypeRe();
 
   function typeFromMime(mime) {
@@ -29,7 +28,7 @@ module.exports = () => {
 
   return {
     async detectType(input) {
-      const [mime, output] = await magic.promise(input, { peekBytes: 1024 });
+      const [mime, output] = await promise(input, { peekBytes: 1024 });
       const type = typeFromMime(mime.type);
       return [type, output];
     },
