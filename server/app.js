@@ -1,6 +1,6 @@
 import express from "express";
 import { strict as assert } from "assert";
-import { create } from "ipfs-http-client";
+import { create as makeIPFSClient } from "ipfs-http-client";
 import makeDebugger from "debug";
 
 import makeThumbnailer from "./thumbnailer.js";
@@ -26,7 +26,7 @@ async function startRootUpdater(ipfs, updateInterval) {
 }
 
 async function getIPFS(ipfsAPI) {
-  const ipfs = create(ipfsAPI);
+  const ipfs = makeIPFSClient(ipfsAPI);
 
   try {
     const version = await ipfs.version();
