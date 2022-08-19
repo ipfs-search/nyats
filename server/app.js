@@ -60,6 +60,10 @@ export default async () => {
     const { protocol, cid, width, height } = req.params;
     const { type } = req.query;
 
+    debug(
+      `Received thumbnail request for ${protocol}://${cid} at ${width}x${height} of type ${type}`
+    );
+
     try {
       const url = await thumbnailer(protocol, cid, type, parseInt(width), parseInt(height));
       assert(url);

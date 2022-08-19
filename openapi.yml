@@ -8,7 +8,7 @@ info:
     not pre-existing) and redirects to IPFS URL, while regularly
     publishing to IPNS. Soon, we will be able to use IPNS as a
     cache, so clients will not even need to hit the server.
-  version: '0.9'
+  version: "0.9"
   title: nyats
   contact:
     name: ipfs-search.com
@@ -19,7 +19,7 @@ info:
     url: https://www.gnu.org/licenses/agpl-3.0.en.html
 
 servers:
-  - url: 'https://api.ipfs-search.com/v1'
+  - url: "https://api.ipfs-search.com/v1"
     description: Production API.
   - url: http://localhost:9614
     description: Default local dev server.
@@ -69,8 +69,19 @@ paths:
           schema:
             type: string
             example: image/webp
-            default: ''
+            default: ""
       responses:
-        '301':
+        "301":
           description: Permanent redirect to thumbnail of the exact requested dimensions, in WebP format, served through IPFS.
-
+          headers:
+            Location:
+              description: "Thumbnail URL."
+              required: true
+              schema:
+                type: string
+                format: uri
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: Moved Permanently. Redirecting to https://gateway.ipfs.io/ipfs/QmNc9hF422Vg1fDs9n9ffsKe3YgnpEHXbe92DDoPbNw7ib/QmcRD4wkPPi6dig81r5sLj9Zm1gDCL4zgpEj9CfuRrGbzF-200-200.webp
