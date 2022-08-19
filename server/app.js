@@ -6,6 +6,7 @@ import makeDebugger from "debug";
 import makeThumbnailer from "./thumbnailer.js";
 
 const debug = makeDebugger("nyats:server");
+
 async function startRootUpdater(ipfs, updateInterval) {
   // Publish to IPNS every minute, but only if the root was changed
   const root = await ipfs.files.stat("/", { hash: true });
@@ -24,28 +25,34 @@ async function startRootUpdater(ipfs, updateInterval) {
   }, updateInterval);
 }
 
-export default async () => {
-  const app = express();
-
-  const IPFS_API = process.env.IPFS_API || "http://localhost:5001";
-  const ipfsGateway = process.env.IPFS_GATEWAY || "https://gateway.ipfs.io";
-  const ipfsTimeout = process.env.IPFS_TIMEOUT || 120 * 1000;
-  const IPNS_UPDATE_INTERVAL = process.env.IPNS_UPDATE_INTERVAL || 60 * 1000;
-
-  const ipfs = create(IPFS_API);
+async function getIPFS(ipfsAPI) {
+  const ipfs = create(ipfsAPI);
 
   try {
     const version = await ipfs.version();
     console.log("IPFS daemon version:", version.version);
-    console.log(`IPFS gateway: ${ipfsGateway}`);
   } catch (e) {
     console.log("Unable to get IPFS daemon version. Is the IPFS daemon running?");
     throw e;
   }
 
+  return ipfs;
+}
+
+export default async () => {
+  const app = express();
+
+  const updateInterval = process.env.IPNS_UPDATE_INTERVAL || 60 * 1000;
+  const ipfsGateway = process.env.IPFS_GATEWAY || "https://gateway.ipfs.io";
+  const ipfsTimeout = process.env.IPFS_TIMEOUT || 120 * 1000;
+  const ipfsAPI = process.env.IPFS_API || "http://localhost:5001";
+
+  console.log(`IPFS gateway: ${ipfsGateway}`);
+
+  const ipfs = await getIPFS(ipfsAPI);
   const thumbnailer = makeThumbnailer(ipfs, { ipfsGateway, ipfsTimeout });
 
-  startRootUpdater(ipfs, IPNS_UPDATE_INTERVAL);
+  startRootUpdater(ipfs, updateInterval);
 
   app.get("/thumbnail/:protocol/:cid/:width/:height/", async (req, res, next) => {
     // TODO: Validation
