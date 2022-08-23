@@ -80,8 +80,3 @@ paths:
               schema:
                 type: string
                 format: uri
-          content:
-            text/plain:
-              schema:
-                type: string
-              example: Moved Permanently. Redirecting to https://gateway.ipfs.io/ipfs/QmNc9hF422Vg1fDs9n9ffsKe3YgnpEHXbe92DDoPbNw7ib/QmcRD4wkPPi6dig81r5sLj9Zm1gDCL4zgpEj9CfuRrGbzF-200-200.webp

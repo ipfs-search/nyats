@@ -54,6 +54,8 @@ export default (ipfs, { ipfsGateway = "https://gateway.ipfs.io", ipfsTimeout = 1
     try {
       debug(`Checking for ${path} on MFS`);
       await ipfs.files.stat(path, { hash: true });
+
+      // Return MFS path to allow for gateway caching.
       // This might unecessarily cause lag
       const root = await ipfs.files.stat("/", { hash: true });
 
