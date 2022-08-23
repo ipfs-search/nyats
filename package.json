@@ -7,7 +7,7 @@
     "start": "node server/server.js",
     "test": "mocha",
     "test:watch": "nodemon --exec mocha",
-    "test:cover": "c8 mocha"
+    "test:cover": "c8 --src server -x server/test --all mocha"
   },
   "repository": {
     "type": "git",
