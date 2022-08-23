@@ -39,6 +39,7 @@
     "api-contract-validator": "^2.2.8",
     "babel-eslint": "^10.1.0",
     "chai": "^4.3.6",
+    "chai-image": "^3.0.0",
     "eslint": "^7.32.0",
     "eslint-config-airbnb": "^18.2.1",
     "eslint-config-defaults": "^9.0.0",
