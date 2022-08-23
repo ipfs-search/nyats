@@ -1,2 +1,4 @@
 spec:
   - "server/test/*.js"
+require:
+  - "mocha-suppress-logs"
