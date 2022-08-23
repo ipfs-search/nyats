@@ -11,8 +11,7 @@ import esmock from "esmock";
 import sinonChai from "sinon-chai";
 use(sinonChai);
 
-import { chaiImage } from "chai-image";
-use(chaiImage);
+import sharp from "sharp";
 
 // OpenAPI matcher
 import { chaiPlugin as matchApiSchema } from "api-contract-validator";
@@ -37,66 +36,100 @@ const asyncIteratorToBuffer = async (readable) => {
   return Buffer.concat(chunks);
 };
 
-describe("Thumbnail generator", () => {
-  describe("Generated image thumbnail", () => {
-    let response, addStub;
+describe("Integration test", () => {
+  const rootCid = "rootCid";
+  const newRootCid = "newRootCid";
+  const cid = "QmcRD4wkPPi6dig81r5sLj9Zm1gDCL4zgpEj9CfuRrGbzF";
+  const width = 100;
+  const height = 100;
+  const protocol = "ipfs";
+  const thumbPath = `/${cid}-${width}-${height}.webp`;
+  const getURL = `/thumbnail/${protocol}/${cid}/${width}/${height}`;
 
-    beforeEach(async () => {
-      const cid = "QmcRD4wkPPi6dig81r5sLj9Zm1gDCL4zgpEj9CfuRrGbzF";
-      const width = 50;
-      const height = 50;
-      const protocol = "ipfs";
+  let response, addStub, statStub, app;
 
-      const statStub = sinon.stub();
-      statStub.throws("not found", "file does not exist");
-
-      const catStub = sinon.stub().resolves(grapefruitStream());
-      addStub = sinon.stub().resolves({
-        cid: "thumbnailCid",
-        size: 34,
-      });
-      const cpStub = sinon.stub().resolves();
-      const flushStub = sinon.stub().resolves();
-
-      // statStub.withArgs("/${cid}-${width}-${height}.webp").throws(
-      //   new Error({
-      //     message: "file does not exist",
-      //   })
-      // );
-      // statStub.withArgs("/").returns({
-      //   cid: "rootCid",
-      // });
-
-      const ipfsMock = {
-        version: sinon.stub().resolves({ version: "0.99.0" }),
-        add: addStub,
-        cat: catStub,
-        files: {
-          stat: statStub,
-          cp: cpStub,
-          flush: flushStub,
-        },
-      };
-
-      const makeApp = await esmock("../app.js", {
-        "ipfs-http-client": {
-          create: () => ipfsMock,
-        },
-      });
-      const app = request(await makeApp());
-      response = await app.get(`/thumbnail/${protocol}/${cid}/${width}/${height}`);
+  beforeEach(async () => {
+    statStub = sinon.stub();
+    statStub.withArgs("/").returns({
+      cid: rootCid,
     });
 
-    it("Should satisfy OpenAPI spec", async () => {
+    const catStub = sinon.stub().resolves(grapefruitStream());
+    addStub = sinon.stub().resolves({
+      cid: "thumbnailCid",
+      size: 34,
+    });
+    const cpStub = sinon.stub().resolves();
+    const flushStub = sinon.stub().resolves(newRootCid);
+
+    const ipfsMock = {
+      version: sinon.stub().resolves({ version: "0.99.0" }),
+      add: addStub,
+      cat: catStub,
+      files: {
+        stat: statStub,
+        cp: cpStub,
+        flush: flushStub,
+      },
+    };
+
+    const makeApp = await esmock("../app.js", {
+      "ipfs-http-client": {
+        create: () => ipfsMock,
+      },
+    });
+    app = request(await makeApp());
+  });
+
+  describe("Generated image thumbnail", () => {
+    beforeEach(async () => {
+      statStub.withArgs(thumbPath).throws("not found", "file does not exist");
+    });
+
+    it("Satisfies OpenAPI spec", async () => {
+      response = await app.get(getURL);
+
       expect(response).to.have.status(301).and.to.matchApiSchema();
     });
 
-    it("Should return an image with correct dimensions", async () => {
-      const addCall = addStub.getCall(0);
-      const thumbnail = await asyncIteratorToBuffer(addCall.firstArg);
-      const original = fs.readFileSync(grapefruitPath);
+    it("Has WebP format and correct dimensions", async () => {
+      response = await app.get(getURL);
 
-      expect(thumbnail).to.matchImage(original);
+      const addCall = addStub.getCall(0);
+
+      const thumbnail = await addCall.firstArg.toBuffer();
+      const thumbnailMeta = await sharp(thumbnail).metadata();
+      expect(thumbnailMeta.width).to.equal(width);
+      expect(thumbnailMeta.height).to.equal(height);
+      expect(thumbnailMeta.format).to.equal("webp");
+    });
+
+    it("Returns correct thumbnail URL", async () => {
+      response = await app.get(getURL);
+
+      expect(response.header["location"]).to.equal(
+        `https://gateway.ipfs.io/ipfs/${newRootCid}${thumbPath}`
+      );
+    });
+  });
+
+  describe("Existing image thumbnail", () => {
+    beforeEach(async () => {
+      statStub.withArgs(thumbPath).resolves();
+    });
+
+    it("Satisfies OpenAPI spec", async () => {
+      response = await app.get(getURL);
+
+      expect(response).to.have.status(301).and.to.matchApiSchema();
+    });
+
+    it("Returns correct thumbnail URL", async () => {
+      response = await app.get(getURL);
+
+      expect(response.header["location"]).to.equal(
+        `https://gateway.ipfs.io/ipfs/${rootCid}${thumbPath}`
+      );
     });
   });
 });
