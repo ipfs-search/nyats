@@ -11,10 +11,6 @@ import makeApp from "../app.js";
 import startIPNSPublisher from "../ipns_publisher.js";
 import makeThumbnailer from "../thumbnailer.js";
 
-// Chai plugins
-// import sinonChai from "sinon-chai";
-// use(sinonChai);
-
 import sharp from "sharp";
 
 // OpenAPI matcher
