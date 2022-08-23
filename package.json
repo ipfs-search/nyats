@@ -5,8 +5,9 @@
   "main": "server/server.js",
   "scripts": {
     "start": "node server/server.js",
-    "test": "mocha --loader=esmock",
-    "test:watch": "mocha --watch"
+    "test": "mocha",
+    "test:watch": "nodemon --exec mocha",
+    "test:cover": "c8 mocha"
   },
   "repository": {
     "type": "git",
@@ -38,6 +39,7 @@
     "@types/supertest": "^2.0.12",
     "api-contract-validator": "^2.2.8",
     "babel-eslint": "^10.1.0",
+    "c8": "^7.12.0",
     "chai": "^4.3.6",
     "eslint": "^7.32.0",
     "eslint-config-airbnb": "^18.2.1",
