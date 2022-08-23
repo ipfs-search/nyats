@@ -1,6 +1,6 @@
 # nyats
 
-[![pipeline status](https://gitlab.com/ipfs-search.com/nyats/badges/master/pipeline.svg)](https://gitlab.com/ipfs-search.com/nyats/-/commits/master)
+[![pipeline status](https://gitlab.com/ipfs-search.com/nyats/badges/main/pipeline.svg)](https://gitlab.com/ipfs-search.com/nyats/-/commits/main)
 [![Maintainability](https://api.codeclimate.com/v1/badges/832428092fde7a9f1dae/maintainability)](https://codeclimate.com/github/ipfs-search/nyats/maintainability)
 [![Backers on Open Collective](https://opencollective.com/ipfs-search/backers/badge.svg)](#backers)
 [![Sponsors on Open Collective](https://opencollective.com/ipfs-search/sponsors/badge.svg)](#sponsors)
@@ -38,7 +38,7 @@ The API can be configured through the following environment variables:
 ## Contributors
 
 This project exists thanks to all the people who contribute.
-<a href="https://github.com/ipfs-search/ipfs-search/graphs/contributors"><img src="https://opencollective.com/ipfs-search/contributors.svg?width=890&button=false" /></a>
+<a href="https://github.com/ipfs-search/nyats/graphs/contributors"><img src="https://opencollective.com/ipfs-search/contributors.svg?width=890&button=false" /></a>
 
 ## Backers
 
