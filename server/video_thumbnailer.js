@@ -87,7 +87,7 @@ async function extractFirstFrame(url, width, height) {
 
 async function makeThumbnail(url, width, height) {
   debug(`Extracting thumbnail from ${url}`);
-  extractors = [extractCoverArt, extractKeyFrame, extractFirstFrame];
+  const extractors = [extractCoverArt, extractKeyFrame, extractFirstFrame];
 
   for (const extract of extractors) {
     try {

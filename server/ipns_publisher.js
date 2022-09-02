@@ -1,3 +1,7 @@
+import debuggerFactory from "debug";
+
+const debug = debuggerFactory("nyats:ipns_publisher");
+
 export default async function startIPNSPublisher(ipfs, updateInterval) {
 	// Publish to IPNS every minute, but only if the root was changed
 	const root = await ipfs.files.stat("/", { hash: true });
@@ -11,7 +15,12 @@ export default async function startIPNSPublisher(ipfs, updateInterval) {
 		if (newrootStr !== rootCidStr) {
 			debug(`Publishing new root ${newrootStr} to IPNS.`);
 			rootCidStr = newrootStr;
-			await ipfs.name.publish(newroot.cid);
+
+			try {
+				ipfs.name.publish(newroot.cid);
+			} catch (e) {
+				console.log("Error publishing to IPNS:", e);
+			}
 		}
 	}, updateInterval);
 
