@@ -4,6 +4,7 @@ import startIPNSPublisher from "./ipns_publisher.js";
 import makeThumbnailer from "./thumbnailer.js";
 
 // Settings
+const nyatsHost = process.env.NYATS_SERVER_HOST || "localhost";
 const nyatsPort = process.env.NYATS_SERVER_PORT || "9614";
 const updateInterval = process.env.IPNS_UPDATE_INTERVAL || 60 * 1000;
 const ipfsAPI = process.env.IPFS_API || "http://localhost:5001";
@@ -23,7 +24,7 @@ try {
 	const thumbnailer = makeThumbnailer(ipfs, { ipfsGateway, ipfsTimeout });
 	const app = await makeApp(thumbnailer);
 
-	app.listen(nyatsPort, () => {
+	app.listen(nyatsPort, nyatsHost, () => {
 		console.log(`nyats server listening on http://localhost:${nyatsPort}`);
 		startIPNSPublisher(ipfs, updateInterval);
 	});

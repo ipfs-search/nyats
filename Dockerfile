@@ -22,5 +22,7 @@ COPY --from=build /app/node_modules /app/node_modules
 WORKDIR /app
 COPY . .
 
+ENV NYATS_SERVER_HOST=*
+
 CMD ["start"]
 ENTRYPOINT ["npm"]

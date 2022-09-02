@@ -28,6 +28,7 @@ You need a local ipfs node; see: https://docs.ipfs.io/how-to/command-line-quick-
 
 The API can be configured through the following environment variables:
 
+- `NYATS_SERVER_HOST` (default: `localhost`)
 - `NYATS_SERVER_PORT` (default: `9614`)
 - `IPFS_API` (default: `http://localhost:5001`)
 - `IPFS_GATEWAY` (default: `https://gateway.ipfs.io`)
