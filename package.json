@@ -4,8 +4,8 @@
   "description": "Not Yet Another Thumbnail Service",
   "main": "server/server.js",
   "scripts": {
-    "start": "node server/server.js",
-    "start:watch": "nodemon server/server.js",
+    "start": "node server/cluster.js",
+    "start:watch": "nodemon server/cluster.js",
     "test": "mocha",
     "test:watch": "nodemon --exec mocha",
     "test:cover": "c8 --src server -x server/test --all mocha"
