@@ -1,6 +1,7 @@
 import process from "node:process";
 import express from "express";
 import { strict as assert } from "assert";
+import healthcheck from "express-healthcheck";
 
 import makeDebugger from "debug";
 const debug = makeDebugger("nyats:server");
@@ -52,6 +53,8 @@ export default (thumbnailer) => {
 
     error(res, 500, err);
   });
+
+  app.use("/healthcheck", healthcheck());
 
   return app;
 };
