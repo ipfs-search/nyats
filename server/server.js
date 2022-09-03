@@ -25,7 +25,7 @@ try {
 	const app = await makeApp(thumbnailer);
 
 	app.listen(nyatsPort, nyatsHost, () => {
-		console.log(`nyats server listening on http://localhost:${nyatsPort}`);
+		console.log(`nyats server listening on http://${nyatsHost}:${nyatsPort}`);
 		startIPNSPublisher(ipfs, updateInterval);
 	});
 } catch (err) {
