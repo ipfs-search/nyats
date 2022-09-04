@@ -34,6 +34,8 @@ The API can be configured through the following environment variables:
 - `IPFS_GATEWAY` (default: `https://gateway.ipfs.io`)
 - `IPNS_UPDATE_INTERVAL` (in ms, default `60000`, 60s)
 
+Example: `VITE_NYATS_API=http://localhost:9614/thumbnail/ VITE_NYATS_IPNS_ROOT=http://localhost:8080/ipns/12D3KooWCfksHSx489oMAH2ysfNTvVtzQLj4u5PHfrXckYNzUU4x/ npm run serve`
+
 ## Contributors
 
 This project exists thanks to all the people who contribute.

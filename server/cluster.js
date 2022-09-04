@@ -1,22 +1,22 @@
-import cluster from "cluster";
-import os from "os";
+import { exit } from "node:process";
 
-import getIPFS from "./getipfs.js";
+import cluster from "cluster";
+
+import { create as makeIPFSClient } from "ipfs-http-client";
 import makeApp from "./app.js";
 import startIPNSPublisher from "./ipns_publisher.js";
 import makeThumbnailer from "./thumbnailer.js";
 
-// Settings
-const nyatsProcesses = process.env.NYATS_PROCESSES || os.cpus().length;
-const nyatsHost = process.env.NYATS_SERVER_HOST || "localhost";
-const nyatsPort = process.env.NYATS_SERVER_PORT || "9614";
-const updateInterval = process.env.IPNS_UPDATE_INTERVAL || 60 * 1000;
-const ipfsAPI = process.env.IPFS_API || "http://localhost:5001";
-const ipfsGateway = process.env.IPFS_GATEWAY || "https://gateway.ipfs.io";
-const ipfsTimeout = process.env.IPFS_TIMEOUT || 120 * 1000;
+import {
+	nyatsHost,
+	nyatsPort,
+	nyatsProcesses,
+	updateInterval,
+	ipfsGateway,
+	ipfsAPI,
+} from "./conf.js";
 
-const ipfs = await getIPFS(ipfsAPI);
-console.log(`IPFS gateway: ${ipfsGateway}`);
+const ipfs = makeIPFSClient(ipfsAPI);
 
 process.on("uncaughtException", (err) => {
 	// This is to prevent the server from crashing on timeout.
@@ -26,20 +26,35 @@ process.on("uncaughtException", (err) => {
 });
 
 if (cluster.isMaster) {
+	try {
+		const version = await ipfs.version();
+		console.log("IPFS daemon version:", version.version);
+	} catch (e) {
+		console.log("Unable to get IPFS daemon version. Is the IPFS daemon running?");
+		throw e;
+	}
+
+	console.log(`IPFS gateway: ${ipfsGateway}`);
+
+	cluster.on("listening", (worker, address) => {
+		console.log(
+			`nyats worker ${worker.process.pid} listening on http://${address.address}:${address.port}`
+		);
+	});
+
+	cluster.on("exit", function (worker) {
+		console.log(`worker ${worker.process.pid} died.\nshutting down server.`);
+		exit(1);
+	});
+
 	// Start workers and listen for messages containing notifyRequest
 	for (var i = 0; i < nyatsProcesses; i++) {
 		cluster.fork();
 	}
 	startIPNSPublisher(ipfs, updateInterval);
 } else {
-	try {
-		const thumbnailer = makeThumbnailer(ipfs, { ipfsGateway, ipfsTimeout });
-		const app = await makeApp(thumbnailer);
+	const thumbnailer = makeThumbnailer(ipfs);
+	const app = makeApp(thumbnailer);
 
-		app.listen(nyatsPort, nyatsHost, () => {
-			console.log(`nyats server listening on http://${nyatsHost}:${nyatsPort}`);
-		});
-	} catch (err) {
-		console.error("Error starting server:", err);
-	}
+	app.listen(nyatsPort, nyatsHost);
 }

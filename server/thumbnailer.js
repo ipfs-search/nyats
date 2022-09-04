@@ -6,15 +6,17 @@ import makeTypeDetector from "./type_detector.js";
 import makeImageThumbnailer from "./image_thumbnailer.js";
 import makeVideoThumbnailer from "./video_thumbnailer.js";
 
+import { ipfsTimeout } from "./conf.js";
+
 const debug = makeDebugger("nyats:thumbnailer");
 
-export default (ipfs, { ipfsGateway = "https://gateway.ipfs.io", ipfsTimeout = 10000 }) => {
+export default (ipfs) => {
   const typeDetector = makeTypeDetector();
   const imageThumbnailer = makeImageThumbnailer();
   const videoThumbnailer = makeVideoThumbnailer();
 
   async function getURL(root, path) {
-    return `${ipfsGateway}/ipfs/${root}${path}`;
+    return `/ipfs/${root}${path}`;
   }
 
   async function getThumbnail(protocol, cid, typeHint, width, height) {
@@ -104,6 +106,8 @@ export default (ipfs, { ipfsGateway = "https://gateway.ipfs.io", ipfsTimeout = 1
 
     const thumbnail = await getThumbnail(protocol, cid, type, width, height);
     const ipfsThumbnail = await writeThumbnail(thumbnail);
+
+    // Note: catch and ignore race where thumbnail already is added to MFS.
     await addToMFS(ipfsThumbnail, path);
     const rootCid = await flushRootCID();
 
