@@ -91,10 +91,17 @@ export default (ipfs) => {
   }
 
   async function addToMFS(ipfsThumbnail, path) {
-    // TODO: Soft fail here
-    // Ref: HTTPError: cp: cannot put node in path /QmWR97DZDJSxQUjKx7EYBhsDWriweYSiM2t1ngPSkZ9HnM-161-90.jpg: directory already has entry by that name
     debug(`Adding thumbnail ${ipfsThumbnail.cid} to ${path}`);
-    return ipfs.files.cp(ipfsThumbnail.cid, path, { flush: false });
+    try {
+      ipfs.files.cp(ipfsThumbnail.cid, path, { flush: false });
+    } catch (e) {
+      if (e.name === "HTTPError" && "directory already has entry by that name" in e.message) {
+        console.warn("Pre-existing thumbnail in ${path}", e.message);
+        return;
+      }
+
+      throw e;
+    }
   }
 
   async function flushRootCID() {
@@ -107,7 +114,6 @@ export default (ipfs) => {
     const thumbnail = await getThumbnail(protocol, cid, type, width, height);
     const ipfsThumbnail = await writeThumbnail(thumbnail);
 
-    // Note: catch and ignore race where thumbnail already is added to MFS.
     await addToMFS(ipfsThumbnail, path);
     const rootCid = await flushRootCID();
 
