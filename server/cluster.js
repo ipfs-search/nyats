@@ -2,21 +2,12 @@ import { exit } from "node:process";
 
 import cluster from "cluster";
 
-import { create as makeIPFSClient } from "ipfs-http-client";
 import makeApp from "./app.js";
+import ipfs from "./ipfs.js";
 import startIPNSPublisher from "./ipns_publisher.js";
 import makeThumbnailer from "./thumbnailer.js";
 
-import {
-	nyatsHost,
-	nyatsPort,
-	nyatsProcesses,
-	updateInterval,
-	ipfsGateway,
-	ipfsAPI,
-} from "./conf.js";
-
-const ipfs = makeIPFSClient(ipfsAPI);
+import { nyatsHost, nyatsPort, nyatsProcesses, updateInterval, ipfsGateway } from "./conf.js";
 
 process.on("uncaughtException", (err) => {
 	// This is to prevent the server from crashing on timeout.
