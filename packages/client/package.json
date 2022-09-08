@@ -15,6 +15,7 @@
   "homepage": "https://github.com/ipfs-search/nyats/tree/main/packages/client#readme",
   "license": "AGPL-3.0-or-later",
   "main": "lib/client.js",
+  "types": "lib/client.d.ts",
   "type": "module",
   "repository": {
     "type": "git",
