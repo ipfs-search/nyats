@@ -8,7 +8,7 @@ import {
 	ResourceType,
 	IPNSThumbnailURL,
 	GenerateThumbnailURL,
-} from "../src/client.js";
+} from "../src/client";
 
 const testHash = "QmfQVstTkoG7ipSkCH2J9hjS9AssQmexeXDEjs7urQavcC";
 const testWidth = 123;
