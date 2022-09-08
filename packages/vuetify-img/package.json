@@ -24,5 +24,8 @@
   "scripts": {},
   "bugs": {
     "url": "https://github.com/ipfs-search/nyats/issues"
+  },
+  "dependencies": {
+    "nyats-client": "*"
   }
 }

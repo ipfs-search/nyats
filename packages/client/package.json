@@ -14,16 +14,29 @@
   "author": "Mathijs de Bruin <mathijs@mathijsfietst.nl>",
   "homepage": "https://github.com/ipfs-search/nyats/tree/main/packages/client#readme",
   "license": "AGPL-3.0-or-later",
-  "main": "src/client.js",
+  "main": "lib/client.js",
+  "types": "lib/client.d.ts",
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ipfs-search/nyats.git"
   },
-  "scripts": {},
+  "scripts": {
+    "build": "tsc",
+    "lint:ts": "tsc --noEmit",
+    "lint:eslint": "eslint",
+    "lint": "npm run lint:ts && npm run lint:eslint",
+    "test": "mocha",
+    "test:watch": "nodemon --exec mocha",
+    "test:cover": "c8 --src lib --all mocha"
+  },
   "bugs": {
     "url": "https://github.com/ipfs-search/nyats/issues"
   },
   "dependencies": {
     "url-join": "^5.0.0"
-  }
+  },
+  "files": [
+    "lib"
+  ]
 }
