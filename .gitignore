@@ -1,8 +1,5 @@
 # See https://help.github.com/ignore-files/ for more about ignoring files.
 
-# compiled output
-packages/*/lib
-
 # dependencies
 node_modules/
 
@@ -20,4 +17,5 @@ yarn-error.log
 
 # local
 **/.DS_Store
+**/lib
 .idea
