@@ -14,18 +14,18 @@
   "author": "Mathijs de Bruin <mathijs@mathijsfietst.nl>",
   "homepage": "https://github.com/ipfs-search/nyats/tree/main/packages/server#readme",
   "license": "AGPL-3.0-or-later",
-  "main": "src/cluster.js",
+  "main": "lib/cluster.js",
   "type": "module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ipfs-search/nyats.git"
   },
   "scripts": {
-    "start": "node src/cluster.js",
-    "start:watch": "nodemon src/cluster.js",
+    "start": "node lib/cluster.js",
+    "start:watch": "nodemon lib/cluster.js",
     "test": "mocha",
     "test:watch": "nodemon --exec mocha",
-    "test:cover": "c8 --src src --all mocha"
+    "test:cover": "c8 --src lib --all mocha"
   },
   "bugs": {
     "url": "https://github.com/ipfs-search/nyats/issues"
@@ -45,15 +45,8 @@
     "api-contract-validator": "^2.2.8",
     "babel-eslint": "^10.1.0",
     "c8": "^7.12.0",
-    "chai": "^4.3.6",
-    "eslint": "^7.32.0",
-    "eslint-config-airbnb": "^18.2.1",
-    "eslint-config-defaults": "^9.0.0",
-    "eslint-config-prettier": "^8.5.0",
     "esmock": "^1.9.6",
-    "mocha": "^10.0.0",
     "mocha-suppress-logs": "^0.3.1",
-    "prettier": "2.7.1",
     "sinon": "^14.0.0",
     "supertest": "^6.2.4"
   },
@@ -69,5 +62,8 @@
     "sharp": "^0.30.7",
     "stream-mmmagic": "^2.3.0",
     "url-join": "^5.0.0"
-  }
+  },
+  "files": [
+    "lib"
+  ]
 }
