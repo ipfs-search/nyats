@@ -28,12 +28,12 @@ defineProps({
 </template>
 
 <script>
-import { defaultConfig, IPNSThumbnailURL, GenerateThumbnailURL } from "nyats-client";
+import { DefaultConfig, IPNSThumbnailURL, GenerateThumbnailURL } from "nyats-client";
 
 const config = {
-	endpoint: import.meta.env.VITE_NYATS_API || defaultConfig.endpoint,
-	gatewayURL: import.meta.env.VITE_NYATS_IPFS_GATEWAY || defaultConfig.gatewayURL,
-	ipnsRoot: import.meta.env.VITE_NYATS_IPNS_ROOT || defaultConfig.ipnsRoot,
+	endpoint: import.meta.env.VITE_NYATS_API || DefaultConfig.endpoint,
+	gatewayURL: import.meta.env.VITE_NYATS_IPFS_GATEWAY || DefaultConfig.gatewayURL,
+	ipnsRoot: import.meta.env.VITE_NYATS_IPNS_ROOT || DefaultConfig.ipnsRoot,
 };
 
 export default {
