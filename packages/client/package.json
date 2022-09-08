@@ -1,0 +1,29 @@
+{
+  "name": "nyats-client",
+  "version": "0.1.0",
+  "description": "Client for the nyats (Not Yet Another Thumbnail Service) IPFS thumbnailing server.",
+  "keywords": [
+    "nyats",
+    "thumbnail",
+    "sharp",
+    "ipfs",
+    "web3",
+    "vuetify",
+    "vue"
+  ],
+  "author": "Mathijs de Bruin <mathijs@mathijsfietst.nl>",
+  "homepage": "https://github.com/ipfs-search/nyats/tree/main/packages/client#readme",
+  "license": "AGPL-3.0-or-later",
+  "main": "src/client.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ipfs-search/nyats.git"
+  },
+  "scripts": {},
+  "bugs": {
+    "url": "https://github.com/ipfs-search/nyats/issues"
+  },
+  "dependencies": {
+    "url-join": "^5.0.0"
+  }
+}
