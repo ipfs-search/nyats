@@ -7,13 +7,20 @@ defineProps({
 	type: {
 		type: String,
 		required: false,
-		default: null,
+	},
+	height: {
+		type: Number,
+		required: false,
+	},
+	width: {
+		type: Number,
+		required: false,
 	},
 });
 </script>
 
 <template>
-	<v-img ref="img" :src="thumbURL()" v-bind="$attrs" @error="thumbErr()">
+	<v-img ref="img" :src="thumbURL" v-bind="$props" @error="thumbErr">
 		<template #placeholder>
 			<slot v-if="generateErr" name="failed" />
 			<slot v-else name="placeholder" />
@@ -40,8 +47,8 @@ export default {
 	data: () => ({
 		ipnsErr: false,
 		generateErr: false,
-		width: null,
-		height: null,
+		thumbHeight: 0,
+		thumbWidth: 0,
 	}),
 	mounted() {
 		this.updateSize(this.$refs.img);
@@ -49,11 +56,49 @@ export default {
 	updated() {
 		this.updateSize(this.$refs.img);
 	},
+	computed: {
+		thumbURL() {
+			if (this.thumbWidth && this.thumbHeight) {
+				if (this.ipnsErr) {
+					console.debug("Generating new thumbnail", this);
+					return GenerateThumbnailURL(
+						this.cid,
+						this.thumbWidth,
+						this.thumbHeight,
+						this.type,
+						config
+					);
+				}
+
+				console.debug("Attempting to load IPNS thumbail", this);
+				console.log(this.cid, this.thumbWidth, this.thumbHeight, config);
+				return IPNSThumbnailURL(this.cid, this.thumbWidth, this.thumbHeight, config);
+			} else {
+				console.warn("No thumbnail dimensions known, not returning URL.", this);
+				return "";
+			}
+		},
+	},
 	methods: {
 		updateSize(el) {
-			if (el) {
-				this.height = el.$el.clientHeight;
-				this.width = el.$el.clientHeight;
+			if (this.height) {
+				this.thumbHeight = this.height;
+				console.debug("Setting prop height:", this.thumbHeight, this);
+			} else if (el && el.$el && el.$el.clientHeight) {
+				this.thumbHeight = el.$el.clientHeight;
+				console.debug("Using client height:", this.thumbHeight, this, el);
+			} else {
+				console.debug("Neither height nor el set.", this);
+			}
+
+			if (this.width) {
+				this.thumbWidth = this.width;
+				console.debug("Setting prop width:", this.thumbWidth, this);
+			} else if (el && el.$el && el.$el.clientWidth) {
+				this.thumbWidth = el.$el.clientWidth;
+				console.debug("Using client width:", this.thumbWidth, this, el.$el);
+			} else {
+				console.debug("Neither width nor el set.", this);
 			}
 		},
 		thumbErr() {
@@ -61,15 +106,6 @@ export default {
 				this.generateErr = true;
 			} else {
 				this.ipnsErr = true;
-			}
-		},
-		thumbURL() {
-			if (this.width && this.height) {
-				if (this.ipnsErr) {
-					return GenerateThumbnailURL(this.cid, this.width, this.height, this.type, config);
-				}
-
-				return IPNSThumbnailURL(this.cid, this.width, this.height, config);
 			}
 		},
 	},

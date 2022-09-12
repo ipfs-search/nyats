@@ -22,6 +22,8 @@
     "url": "git+https://github.com/ipfs-search/nyats.git"
   },
   "scripts": {
+    "prepublish": "npm run lint && npm run test && npm run clean && npm run build",
+    "clean": "rm -rf lib/*",
     "build": "tsc",
     "lint:ts": "tsc --noEmit",
     "lint:eslint": "eslint",
