@@ -27,8 +27,8 @@ let cid = ref("QmbStTMnunBtT2fhVRPHaq1TLCD1DftUJ8h6dxvoNCqSB6");
         <v-row>
           <v-col>
             <v-card elevation="2">
-              <v-card-title>100px width, aspect-ratio 1</v-card-title>
-              <VImgCID :cid="cid" :width="100" type="image" aspect-ratio="1">
+              <v-card-title>100px width, 100px height</v-card-title>
+              <VImgCID :cid="cid" :width="100" :height="100" type="image" aspect-ratio="1">
                 <template #placeholder>
                   <v-row class="fill-height ma-0" align="center" justify="center">
                     <v-progress-circular indeterminate />

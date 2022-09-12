@@ -51,10 +51,10 @@ export default {
 		thumbWidth: 0,
 	}),
 	mounted() {
-		this.updateSize(this.$refs.img);
+		this.updateSize();
 	},
 	updated() {
-		this.updateSize(this.$refs.img);
+		this.updateSize();
 	},
 	computed: {
 		thumbURL() {
@@ -80,13 +80,16 @@ export default {
 		},
 	},
 	methods: {
-		updateSize(el) {
+		updateSize() {
+			const clientHeight = this.$refs.img?.$el.clientHeight;
+			const clientWidth = this.$refs.img?.$el.clientWidth;
+
 			if (this.height) {
 				this.thumbHeight = this.height;
 				console.debug("Setting prop height:", this.thumbHeight, this);
-			} else if (el && el.$el && el.$el.clientHeight) {
-				this.thumbHeight = el.$el.clientHeight;
-				console.debug("Using client height:", this.thumbHeight, this, el);
+			} else if (clientHeight) {
+				this.thumbHeight = clientHeight;
+				console.debug("Using client height:", this.thumbHeight, this);
 			} else {
 				console.debug("Neither height nor el set.", this);
 			}
@@ -94,9 +97,9 @@ export default {
 			if (this.width) {
 				this.thumbWidth = this.width;
 				console.debug("Setting prop width:", this.thumbWidth, this);
-			} else if (el && el.$el && el.$el.clientWidth) {
-				this.thumbWidth = el.$el.clientWidth;
-				console.debug("Using client width:", this.thumbWidth, this, el.$el);
+			} else if (clientWidth) {
+				this.thumbWidth = clientWidth;
+				console.debug("Using client width:", this.thumbWidth, this);
 			} else {
 				console.debug("Neither width nor el set.", this);
 			}
