@@ -2,6 +2,35 @@
   "name": "nyats-vuetify-img",
   "version": "0.1.0",
   "description": "Vuetify3 thumbnailing component, based on v-img, rendering thumbnails for IPFS CID's using IPNS for caching and nyats API as fallback.",
+  "author": "Mathijs de Bruin <mathijs@mathijsfietst.nl>",
+  "scripts": {
+    "serve": "vite preview",
+    "build": "vite build",
+    "dev": "vite",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@mdi/font": "5.9.55",
+    "is-ipfs": "^6.0.2",
+    "nyats-client": "*",
+    "roboto-fontface": "*",
+    "vue": "^3.2.37",
+    "vuetify": "^3.0.0-beta.0",
+    "webfontloader": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/webfontloader": "^1.0.0",
+    "@vitejs/plugin-vue": "^3.1.0",
+    "typescript": "^4.6.4",
+    "vite": "^3.1.0",
+    "vite-plugin-vuetify": "^1.0.0-alpha.12",
+    "vue-cli-plugin-vuetify": "~2.5.5",
+    "vue-tsc": "^0.40.4"
+  },
+  "bugs": {
+    "url": "https://github.com/ipfs-search/nyats/issues"
+  },
+  "homepage": "https://github.com/ipfs-search/nyats/tree/main/packages/vuetify-img#readme",
   "keywords": [
     "nyats",
     "vuetify",
@@ -13,19 +42,10 @@
     "ipns",
     "v-img"
   ],
-  "author": "Mathijs de Bruin <mathijs@mathijsfietst.nl>",
-  "homepage": "https://github.com/ipfs-search/nyats/tree/main/packages/vuetify-img#readme",
   "license": "AGPL-3.0-or-later",
-  "main": "src/vuetify-img-cid.vue",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ipfs-search/nyats.git"
   },
-  "scripts": {},
-  "bugs": {
-    "url": "https://github.com/ipfs-search/nyats/issues"
-  },
-  "dependencies": {
-    "nyats-client": "*"
-  }
+  "type": "module"
 }
