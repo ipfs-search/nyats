@@ -16,16 +16,27 @@
   "author": "Mathijs de Bruin <mathijs@mathijsfietst.nl>",
   "homepage": "https://github.com/ipfs-search/nyats/tree/main/packages/vuetify-img#readme",
   "license": "AGPL-3.0-or-later",
-  "main": "src/vuetify-img-cid.vue",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite build",
+    "preview": "vite preview"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ipfs-search/nyats.git"
   },
-  "scripts": {},
   "bugs": {
     "url": "https://github.com/ipfs-search/nyats/issues"
   },
   "dependencies": {
+    "vue": "^3.2.37",
     "nyats-client": "*"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^3.1.0",
+    "typescript": "^4.6.4",
+    "vite": "^3.1.0",
+    "vue-tsc": "^0.40.4"
   }
 }
