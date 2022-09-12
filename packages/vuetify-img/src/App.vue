@@ -1,8 +1,11 @@
 <script setup>
 import { ref } from "vue";
+import { cid as isCID } from "is-ipfs";
 import VImgCID from "./components/vuetify-img-cid.vue";
 
-let cid = ref("QmbStTMnunBtT2fhVRPHaq1TLCD1DftUJ8h6dxvoNCqSB6");
+const initialCid = "bafybeidovjdvuarzq2mldmvudhccenl4e4rm2bvhqzjye2fpksm2ifjuge";
+let cid = ref(initialCid);
+let formCid = ref(initialCid);
 </script>
 
 <template>
@@ -21,7 +24,11 @@ let cid = ref("QmbStTMnunBtT2fhVRPHaq1TLCD1DftUJ8h6dxvoNCqSB6");
         </v-row>
         <v-row>
           <v-col>
-            <v-text-field label="CID" placeholder="CID" v-model="cid"></v-text-field>
+            <v-text-field
+              label="CID"
+              v-model="cid"
+              :rules="[(v) => isCID(v) || 'Enter valid CID.']"
+            />
           </v-col>
         </v-row>
         <v-row>
@@ -47,8 +54,8 @@ let cid = ref("QmbStTMnunBtT2fhVRPHaq1TLCD1DftUJ8h6dxvoNCqSB6");
         <v-row>
           <v-col>
             <v-card elevation="2">
-              <v-card-title>100px width, aspect-ratio 2</v-card-title>
-              <VImgCID :cid="cid" :width="100" aspect-ratio="2">
+              <v-card-title>200px width, aspect-ratio 2</v-card-title>
+              <VImgCID :cid="cid" :width="200" aspect-ratio="2">
                 <template #placeholder>
                   <v-row class="fill-height ma-0" align="center" justify="center">
                     <v-progress-circular indeterminate />
@@ -88,3 +95,15 @@ let cid = ref("QmbStTMnunBtT2fhVRPHaq1TLCD1DftUJ8h6dxvoNCqSB6");
     </v-main>
   </v-app>
 </template>
+
+<script>
+export default {
+  methods: {
+    formChange(v) {
+      if (isCID(v)) {
+        this.cid = v;
+      }
+    },
+  },
+};
+</script>
