@@ -1,6 +1,8 @@
 import debuggerFactory from "debug";
 import sharp from "sharp";
 
+import { animateThumbnails } from "./conf.js";
+
 const debug = debuggerFactory("nyats:image_thumbnailer");
 
 function isLossless(metadata) {
@@ -26,7 +28,7 @@ function isLossless(metadata) {
 
 async function makeThumbnail(stream, width, height) {
   const image = sharp({
-    animated: true,
+    animated: animateThumbnails,
     failOn: "error",
   });
   stream.pipe(image);
@@ -34,7 +36,15 @@ async function makeThumbnail(stream, width, height) {
   const metadata = await image.clone().metadata();
   debug("Got metadata:", metadata);
 
-  const isAnimated = metadata.pages > 1;
+  let webpOptions = {
+    lossless: isLossless(metadata),
+  };
+  const isAnimated = animateThumbnails && metadata.pages > 1;
+
+  if (isAnimated) {
+    webpOptions.loop = metadata.loop;
+    webpOptions.delay = metadata.delay;
+  }
 
   const transformer = image
     .resize(width, height, {
@@ -44,11 +54,7 @@ async function makeThumbnail(stream, width, height) {
     .timeout({
       seconds: 120,
     })
-    .webp({
-      lossless: isLossless(metadata),
-      loop: metadata.loop,
-      delay: metadata.delay,
-    });
+    .webp(webpOptions);
 
   return transformer;
 }
