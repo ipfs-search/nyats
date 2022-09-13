@@ -8,10 +8,12 @@ const debug = debuggerFactory("nyats:image_thumbnailer");
 function isLossless(metadata) {
   switch (metadata.format) {
     case "jpeg":
+    case "heif":
       return false;
     case "png":
     case "gif":
     case "svg":
+    case "tiff":
       return true;
     case "webp":
       // Consistent with the VP8 bitstream, lossy WebP works exclusively with

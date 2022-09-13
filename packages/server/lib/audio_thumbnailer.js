@@ -1,5 +1,5 @@
 import makeDebugger from "debug";
-import { ffmpegExtractor, scaleFilter } from "./ffmpeg_extractor";
+import { ffmpegExtractor, scaleFilter } from "./ffmpeg_extractor.js";
 
 const debug = makeDebugger("nyats:audio_thumbnailer");
 
@@ -19,27 +19,27 @@ async function extractCoverArt(url, width, height) {
   ]);
 }
 
-module.exports = () => {
-  return {
-    async makeThumbnail(url, width, height) {
-      debug(`Extracting thumbnail from ${url}`);
-      const extractors = [extractCoverArt];
+async function makeThumbnail(url, width, height) {
+  debug(`Extracting thumbnail from ${url}`);
+  const extractors = [extractCoverArt];
 
-      for (const extract of extractors) {
-        try {
-          const { stdout, stderr } = await extract(url, width, height);
+  for (const extract of extractors) {
+    try {
+      const { stdout, stderr } = await extract(url, width, height);
 
-          stderr.on("data", (data) => {
-            debug(data.toString("utf8"));
-          });
+      stderr.on("data", (data) => {
+        debug(data.toString("utf8"));
+      });
 
-          return stdout;
-        } catch (e) {
-          debug(e);
-        }
-      }
+      return stdout;
+    } catch (e) {
+      debug(e);
+    }
+  }
 
-      throw new Error("All thumbnail methods failed.");
-    },
-  };
-};
+  throw new Error("All thumbnail methods failed.");
+}
+
+export default function thumbnailerFactory() {
+  return makeThumbnail;
+}

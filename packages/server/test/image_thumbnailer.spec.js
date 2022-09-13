@@ -25,6 +25,9 @@ const tests = [
 	},
 	{ format: "Static GIF", filename: "Sunflower_as_gif_websafe.gif" },
 	{ format: "Animated GIF", filename: "Rotating_earth_(large).gif", animated: true },
+	{ format: "TIFF", filename: "file_example_TIFF_1MB.tiff" },
+	{ format: "SVG", filename: "logo-black.svg", transparent: true },
+	{ format: "AVIF", filename: "kimono.avif" },
 ];
 const testWidth = 123;
 const testHeight = 234;
