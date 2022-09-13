@@ -28,6 +28,8 @@ const tests = [
 	{ format: "TIFF", filename: "file_example_TIFF_1MB.tiff" },
 	{ format: "SVG", filename: "logo-black.svg", transparent: true },
 	{ format: "AVIF", filename: "kimono.avif" },
+	// Soon(tm)
+	// { format: "PDF", filename: "trautwein2022a.pdf" },
 ];
 const testWidth = 123;
 const testHeight = 234;
