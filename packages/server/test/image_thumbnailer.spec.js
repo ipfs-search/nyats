@@ -1,16 +1,10 @@
 "strict";
-import path from "path";
-import fs from "fs";
 import sharp from "sharp";
 import { expect } from "chai";
 
 import makeThumbnailer from "../lib/image_thumbnailer.js";
 import { animateThumbnails } from "../lib/conf.js";
-
-function getStream(filename) {
-	const filePath = path.resolve(`test/assets/${filename}`);
-	return fs.createReadStream(filePath);
-}
+import { getStream } from "./util.js";
 
 const thumbnailer = makeThumbnailer();
 const tests = [
