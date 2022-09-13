@@ -24,7 +24,7 @@
   "scripts": {
     "build": "tsc",
     "lint:ts": "tsc --noEmit",
-    "lint:eslint": "eslint",
+    "lint:eslint": "eslint src test",
     "lint": "npm run lint:ts && npm run lint:eslint",
     "test": "mocha",
     "test:watch": "nodemon --exec mocha",
