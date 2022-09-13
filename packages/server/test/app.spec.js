@@ -4,27 +4,25 @@ import sinon from "sinon";
 import request from "supertest";
 import path from "path";
 import fs from "fs";
-import buffer from "buffer";
-import esmock from "esmock";
 
-import makeApp from "../app.js";
-import startIPNSPublisher from "../ipns_publisher.js";
-import makeThumbnailer from "../thumbnailer.js";
+import makeApp from "../lib/app.js";
+import makeThumbnailer from "../lib/thumbnailer.js";
+import { ipfsGateway } from "../lib/conf.js";
 
 import sharp from "sharp";
 
 // OpenAPI matcher
 import { chaiPlugin as matchApiSchema } from "api-contract-validator";
-const apiDefinitionsPath = path.resolve("openapi.yml");
+const apiDefinitionsPath = path.resolve("../../openapi.yml");
 use(matchApiSchema({ apiDefinitionsPath }));
 
-const grapefruitPath = path.resolve("server/test/grapefruit.jpg");
+const grapefruitPath = path.resolve("test/assets/grapefruit.jpg");
 async function grapefruitStream() {
   const readStream = fs.createReadStream(grapefruitPath);
   return readStream;
 }
 
-describe("Integration tests", () => {
+describe("app integration tests", function () {
   const rootCid = "rootCid";
   const newRootCid = "newRootCid";
   const cid = "QmcRD4wkPPi6dig81r5sLj9Zm1gDCL4zgpEj9CfuRrGbzF";
@@ -33,12 +31,10 @@ describe("Integration tests", () => {
   const protocol = "ipfs";
   const thumbPath = `/${cid}-${width}-${height}.webp`;
   const getURL = `/thumbnail/${protocol}/${cid}/${width}/${height}`;
-  const ipfsGateway = "https://ipfsgateway/";
-  const ipfsTimeout = 60000;
 
   let response, addStub, statStub, app, grapefruit;
 
-  beforeEach(async () => {
+  beforeEach(async function () {
     statStub = sinon.stub();
     statStub.withArgs("/").returns({
       cid: rootCid,
@@ -64,18 +60,11 @@ describe("Integration tests", () => {
       },
     };
 
-    const getIPFS = await esmock("../getipfs.js", {
-      "ipfs-http-client": {
-        create: () => ipfsMock,
-      },
-    });
-
-    const ipfs = await getIPFS("http://localhost:5001");
-    const thumbnailer = makeThumbnailer(ipfs, { ipfsGateway, ipfsTimeout });
+    const thumbnailer = makeThumbnailer(ipfsMock);
     app = request(makeApp(thumbnailer));
   });
 
-  afterEach(async () => {
+  afterEach(async function () {
     grapefruit.destroy();
   });
 
@@ -93,8 +82,8 @@ describe("Integration tests", () => {
     };
   }
 
-  describe("Generated image thumbnail", () => {
-    beforeEach(async () => {
+  describe("Generated image thumbnail", function () {
+    beforeEach(async function () {
       statStub.withArgs(thumbPath).throws("not found", "file does not exist");
     });
 
@@ -104,7 +93,7 @@ describe("Integration tests", () => {
       expectThumbnailURL(`${ipfsGateway}/ipfs/${newRootCid}${thumbPath}`)
     );
 
-    it("Has WebP format and correct dimensions", async () => {
+    it("Has WebP format and correct dimensions", async function () {
       response = await app.get(getURL);
 
       const addCall = addStub.getCall(0);
@@ -117,8 +106,8 @@ describe("Integration tests", () => {
     });
   });
 
-  describe("Existing image thumbnail", () => {
-    beforeEach(async () => {
+  describe("Existing image thumbnail", function () {
+    beforeEach(async function () {
       statStub.withArgs(thumbPath).resolves();
     });
 
