@@ -2,10 +2,8 @@
 import path from "path";
 import fs from "fs";
 import http from "http";
-import makeDebugger from "debug";
 import handler from "serve-handler";
 
-const debug = makeDebugger("nyats:spec:util");
 const assetDir = "test/assets";
 
 export function getStream(filename) {
