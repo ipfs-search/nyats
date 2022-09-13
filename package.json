@@ -12,7 +12,9 @@
     "sharp"
   ],
   "scripts": {
-    "bootstrap": "lerna bootstrap"
+    "bootstrap": "lerna bootstrap",
+    "build": "lerna run build",
+    "test": "lerna run test"
   },
   "author": "Mathijs de Bruin",
   "license": "AGPL-3.0-or-later",
