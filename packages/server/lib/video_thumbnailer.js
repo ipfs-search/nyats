@@ -2,7 +2,7 @@ import makeDebugger from "debug";
 
 const debug = makeDebugger("nyats:video_thumbnailer");
 
-import { ffmpegExtractor, scaleFilter } from "./ffmpeg_extractor";
+import { ffmpegExtractor, scaleFilter } from "./ffmpeg_extractor.js";
 
 async function extractKeyFrames(url, width, height) {
   debug("Extract first 40% scene change 30 vframes(full frames).");
@@ -33,7 +33,6 @@ async function extractKeyFrames(url, width, height) {
 async function extractFirstFrame(url, width, height) {
   debug("Extracting first frame");
   return ffmpegExtractor([
-    // '-f', 'matroska', // ffmpeg's type detection seems to work 'fine'
     "-i",
     `async:${url}`,
     "-vf",
@@ -45,12 +44,12 @@ async function extractFirstFrame(url, width, height) {
   ]);
 }
 
-module.exports = () => {
-  return {
-    async makeThumbnail(url, width, height) {
-      debug(`Extracting thumbnail from ${url}`);
+async function makeThumbnail(url, width, height) {
+  debug(`Extracting thumbnail from ${url}`);
 
-      return extractKeyFrames(url, width, height);
-    },
-  };
-};
+  return extractFirstFrame(url, width, height);
+}
+
+export default function thumbnailerFactory() {
+  return makeThumbnail;
+}

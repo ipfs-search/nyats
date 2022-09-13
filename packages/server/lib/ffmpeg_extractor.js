@@ -6,12 +6,21 @@ import makeDebugger from "debug";
 const debug = makeDebugger("nyats:ffmpeg_extractor");
 const ffmpeg_debug = makeDebugger("nyats:ffmpeg");
 
-async function ffmpegExtractor(params) {
-  const commonParams = ["-f", "webp", "-", "-loglevel", "info", "-hide_banner"];
+export async function ffmpegExtractor(params) {
+  const commonParams = [
+    "-c:v",
+    "libwebp",
+    "-f",
+    "image2",
+    "-",
+    "-loglevel",
+    "info",
+    "-hide_banner",
+  ];
 
   const fullParams = params.concat(commonParams);
 
-  debug(`Params: ${fullParams}`);
+  ffmpeg_debug("ffmpeg ", fullParams.join(" "));
 
   const ffmpeg = childProcess.spawn(pathToFfmpeg, fullParams, {
     encoding: "buffer",
@@ -19,31 +28,33 @@ async function ffmpegExtractor(params) {
     timeout: 60000, // 30s timeout by default
   });
 
+  // Debug log stdout closing
   ffmpeg.stdout.on("close", () => {
     debug("stdout closed");
   });
+
+  // Pipe stderr to debug
   ffmpeg.stderr.on("data", (data) => {
     ffmpeg_debug(data.toString("utf8"));
   });
 
-  return new Promise((resolve, reject) => {
-    ffmpeg.on("spawn", () => {
-      debug("ffmpeg spawned");
-      resolve(ffmpeg.stdout);
-    });
+  ffmpeg.once("exit", (code) => {
+    if (code !== 0) {
+      throw new Error(`ffmpeg process exited with code ${code}`);
+    }
+  });
 
-    ffmpeg.on("error", (err) => {
-      console.log(`Error in ffmpeg: ${err}`);
-      reject(err);
+  ffmpeg.once("error", (err) => {
+    throw err;
+  });
+
+  return new Promise((resolve) => {
+    ffmpeg.once("spawn", () => {
+      resolve(ffmpeg.stdout);
     });
   });
 }
 
-function scaleFilter(width, height) {
+export function scaleFilter(width, height) {
   return `scale=${width}:${height}:force_original_aspect_ratio=increase,crop=${width}:${height}`;
 }
-
-module.exports = {
-  ffmpegExtractor,
-  scaleFilter,
-};
