@@ -61,7 +61,7 @@
     "ipfs-http-client": "^51.0.1",
     "micromatch": "^4.0.5",
     "node-abort-controller": "^3.0.1",
-    "sharp": "^0.30.7",
+    "sharp": "^0.31.0",
     "stream-mmmagic": "^2.3.0",
     "url-join": "^5.0.0"
   },
