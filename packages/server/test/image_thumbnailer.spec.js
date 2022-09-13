@@ -5,6 +5,7 @@ import sharp from "sharp";
 import { expect } from "chai";
 
 import makeThumbnailer from "../lib/image_thumbnailer.js";
+import { animateThumbnails } from "../lib/conf.js";
 
 function getStream(filename) {
 	const filePath = path.resolve(`test/assets/${filename}`);
@@ -60,7 +61,7 @@ describe("image_thumbnailer", function () {
 				});
 			} else {
 				it("Does not have transparency", function () {
-					if (animated) {
+					if (animateThumbnails && animated) {
 						// Fails for  Animated WebP thumbnail from bored_animation.webp and
 						// Animated GIF thumbnail from Rotating_earth_(large).gif
 						this.skip();
@@ -70,7 +71,7 @@ describe("image_thumbnailer", function () {
 				});
 			}
 
-			if (animated) {
+			if (animateThumbnails && animated) {
 				it("Is animated", function () {
 					if (format.includes("PNG") && animated && transparent) {
 						// Bug: sharp doesn't seem to detect 'pages' (frames) in transparent APNG.
