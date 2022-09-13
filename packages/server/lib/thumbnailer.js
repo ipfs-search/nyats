@@ -1,10 +1,10 @@
 import { strict as assert } from "assert";
 import asyncIteratorToStream from "async-iterator-to-stream";
 import makeDebugger from "debug";
-
 import makeTypeDetector from "./type_detector.js";
 import makeImageThumbnailer from "./image_thumbnailer.js";
 import makeVideoThumbnailer from "./video_thumbnailer.js";
+import makeAudioThumbnailer from "./audio_thumbnailer.js";
 
 import { ipfsTimeout } from "./conf.js";
 
@@ -14,6 +14,7 @@ export default (ipfs) => {
   const typeDetector = makeTypeDetector();
   const imageThumbnailer = makeImageThumbnailer();
   const videoThumbnailer = makeVideoThumbnailer();
+  const audioThumbnailer = makeAudioThumbnailer();
 
   async function getURL(root, path) {
     return `/ipfs/${root}${path}`;
@@ -43,8 +44,10 @@ export default (ipfs) => {
         return imageThumbnailer(stream, width, height);
 
       case "video":
+        return videoThumbnailer.makeThumbnail(`http://localhost:8080/ipfs/${cid}`, width, height);
+
       case "audio":
-        return videoThumbnailer(`http://localhost:8080/ipfs/${cid}`, width, height);
+        return audioThumbnailer.makeThumbnail(`http://localhost:8080/ipfs/${cid}`, width, height);
 
       default:
         throw Error(`unsupported type: ${type}`);
