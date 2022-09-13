@@ -1,4 +1,2 @@
 require:
   - "mocha-suppress-logs"
-node-option:
-  - "loader=esmock"
