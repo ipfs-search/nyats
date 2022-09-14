@@ -1,10 +1,13 @@
 "strict";
 import sharp from "sharp";
-import { expect } from "chai";
+import { expect, use } from "chai";
+import chaiAsPromised from "chai-as-promised";
 
-import makeThumbnailer from "../lib/image_thumbnailer.js";
-import { animateThumbnails } from "../lib/conf.js";
-import { getStream } from "./util.js";
+use(chaiAsPromised);
+
+import { ValidationError, default as makeThumbnailer } from "../src/image_thumbnailer";
+import { animateThumbnails } from "../src/conf";
+import { getStream } from "./util";
 
 const thumbnailer = makeThumbnailer();
 const tests = [
@@ -35,6 +38,15 @@ const testWidth = 123;
 const testHeight = 234;
 
 describe("image_thumbnailer", function () {
+  describe("when given a PNG bomb", function () {
+    it("spits it out with an error", async function () {
+      this.timeout(10000);
+      const stream = getStream("bomb.png");
+      const thumbPromise = thumbnailer(stream, testWidth, testHeight);
+      expect(thumbPromise).to.be.rejectedWith(ValidationError);
+    });
+  });
+
   // eslint-disable-next-line mocha/no-setup-in-describe
   tests.forEach(({ format, filename, animated = false, transparent = false }) => {
     describe(`Generating ${format} thumbnail from ${filename}`, function () {
