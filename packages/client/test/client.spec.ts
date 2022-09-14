@@ -20,11 +20,11 @@ const testConfig: ClientConfig = {
   endpoint: "https://endpoint.com/path",
 };
 
-describe("IPNSThumbnailURL", () => {
+describe("IPNSThumbnailURL", function () {
   const filename = `${testHash}-${testWidth}-${testHeight}.webp`;
 
-  describe("with default configuration", () => {
-    it("returns correct URL", () => {
+  describe("with default configuration", function () {
+    it("returns correct URL", function () {
       const redirectURL = IPNSThumbnailURL(testHash, testWidth, testHeight);
       expect(redirectURL).to.startWith(DefaultConfig.gatewayURL);
 
@@ -33,30 +33,34 @@ describe("IPNSThumbnailURL", () => {
     });
   });
 
-  describe("with custom configuration", () => {
-    it("returns correct URL", () => {
+  describe("with custom configuration", function () {
+    it("returns correct URL", function () {
       const redirectURL = IPNSThumbnailURL(testHash, testWidth, testHeight, testConfig);
       expect(redirectURL).to.equal("http://localhost:8080/ipfs/testroot.com/" + filename);
     });
   });
 });
 
-describe("GenerateThumbnailURL", () => {
+// eslint-disable-next-line mocha/max-top-level-suites
+describe("GenerateThumbnailURL", function () {
   const protocol = "ipfs";
   const path = `${protocol}/${testHash}/${testWidth}/${testHeight}/`;
 
-  describe("with default configuration", () => {
-    describe("without type specified", () => {
-      const redirectURL = GenerateThumbnailURL(testHash, testWidth, testHeight);
-
-      it("returns correct URL", () => {
+  describe("with default configuration", function () {
+    describe("without type specified", function () {
+      it("returns correct URL", function () {
+        const redirectURL = GenerateThumbnailURL(testHash, testWidth, testHeight);
         expect(redirectURL).to.equal(DefaultConfig.endpoint + path);
       });
     });
-    describe("with type specified", () => {
-      const redirectURL = GenerateThumbnailURL(testHash, testWidth, testHeight, ResourceType.Image);
-
-      it("includes type in URL", () => {
+    describe("with type specified", function () {
+      it("includes type in URL", function () {
+        const redirectURL = GenerateThumbnailURL(
+          testHash,
+          testWidth,
+          testHeight,
+          ResourceType.Image
+        );
         expect(redirectURL).to.startWith(DefaultConfig.endpoint);
 
         const url = new URL(redirectURL);
@@ -65,16 +69,16 @@ describe("GenerateThumbnailURL", () => {
     });
   });
 
-  describe("with custom configuration", () => {
-    const redirectURL = GenerateThumbnailURL(
-      testHash,
-      testWidth,
-      testHeight,
-      ResourceType.Unknown,
-      testConfig
-    );
+  describe("with custom configuration", function () {
+    it("returns correct URL", function () {
+      const redirectURL = GenerateThumbnailURL(
+        testHash,
+        testWidth,
+        testHeight,
+        ResourceType.Unknown,
+        testConfig
+      );
 
-    it("returns correct URL", () => {
       expect(redirectURL).to.equal("https://endpoint.com/path/" + path);
     });
   });
