@@ -1,1 +1,4 @@
-node_modules/
+**/node_modules/
+coverage/
+packages/client/lib/
+packages/server/test/assets/
