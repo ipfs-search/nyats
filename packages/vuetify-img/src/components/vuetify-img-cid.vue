@@ -1,26 +1,27 @@
 <template>
-	<v-img ref="img" :src="thumbURL" v-bind="$props" @error="thumbErr">
-    <template #placeholder>
-      <slot v-if="generateErr" name="failed" />
-      <slot v-else name="placeholder" >
-        <v-row class="fill-height ma-0" align="center" justify="center">
-          <v-progress-circular indeterminate />
-        </v-row>
-      </slot>
-    </template>
+  <img :src="thumbURL" ref="img" v-bind="$props"/>
+<!--	<v-img ref="img" :src="thumbURL" v-if="thumbURL" v-bind="$props" @error="thumbErr">-->
+<!--    <template #placeholder>-->
+<!--      <slot v-if="generateErr" name="failed" />-->
+<!--      <slot v-else name="placeholder" >-->
+<!--        <v-row class="fill-height ma-0" align="center" justify="center">-->
+<!--          <v-progress-circular indeterminate />-->
+<!--        </v-row>-->
+<!--      </slot>-->
+<!--    </template>-->
 
-    <template #failed>
-      <slot name="failed" >
-        <v-row class="fill-height ma-0" align="center" justify="center">
-          <v-icon color="grey" size="large" :icon="mdiRobotDead" />
-        </v-row>
-      </slot>
-    </template>
+<!--    <template #failed>-->
+<!--      <slot name="failed" >-->
+<!--        <v-row class="fill-height ma-0" align="center" justify="center">-->
+<!--          <v-icon color="grey" size="large" :icon="mdiRobotDead" />-->
+<!--        </v-row>-->
+<!--      </slot>-->
+<!--    </template>-->
 
-    <template #default>
-      <slot name="default" />
-    </template>
-  </v-img>
+<!--    <template #default>-->
+<!--      <slot name="default" />-->
+<!--    </template>-->
+<!--  </v-img>-->
 </template>
 
 <script>
@@ -94,8 +95,8 @@ export default {
   },
   methods: {
     updateSize() {
-      const clientHeight = this.$refs.img?.$el.clientHeight;
-      const clientWidth = this.$refs.img?.$el.clientWidth;
+      const clientHeight = this.$refs.img?.clientHeight;
+      const clientWidth = this.$refs.img?.clientWidth;
 
       if (this.height) {
         this.thumbHeight = this.height;
