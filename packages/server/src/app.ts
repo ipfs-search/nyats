@@ -6,6 +6,7 @@ import urlJoin from "url-join";
 import { ipfsGateway } from "./conf.js";
 
 import makeDebugger from "debug";
+import { Type, Protocol, Thumbnailer, ThumbnailRequest } from "./types.js";
 const debug = makeDebugger("nyats:server");
 
 function getGatewayURL(req, ipfsPath) {
@@ -17,7 +18,7 @@ function getGatewayURL(req, ipfsPath) {
   return urlJoin(ipfsGateway, ipfsPath);
 }
 
-export default (thumbnailer) => {
+export default (thumbnailer: Thumbnailer): express.Express => {
   const app = express();
 
   app.get("/thumbnail/:protocol/:cid/:width/:height/", async (req, res, next) => {
@@ -31,7 +32,14 @@ export default (thumbnailer) => {
     );
 
     try {
-      const ipfsPath = await thumbnailer(protocol, cid, type, parseInt(width), parseInt(height));
+      const thumbReq: ThumbnailRequest = {
+        protocol: Protocol[protocol],
+        cid,
+        type: Type[type as string],
+        width: parseInt(width),
+        height: parseInt(height),
+      };
+      const ipfsPath = await thumbnailer(thumbReq);
       assert(ipfsPath);
 
       res.setHeader("x-ipfs-path", ipfsPath);

@@ -7,13 +7,12 @@ import makeVideoThumbnailer from "./video_thumbnailer.js";
 import makeAudioThumbnailer from "./audio_thumbnailer.js";
 
 import { ipfsTimeout } from "./conf.js";
-import { Path, ThumbnailRequest, URL } from "./types.js";
-import { IPFSHTTPClient } from "ipfs-http-client";
-import { AddResult } from "ipfs-core-types/src/root.js";
+import { CID, Path, ThumbnailRequest, URL } from "./types.js";
+import type { IPFS } from "ipfs-core-types";
 
 const debug = makeDebugger("nyats:thumbnailer");
 
-export default (ipfs: IPFSHTTPClient) => {
+export default (ipfs: IPFS) => {
   const typeDetector = makeTypeDetector();
   const imageThumbnailer = makeImageThumbnailer();
   const videoThumbnailer = makeVideoThumbnailer();
@@ -82,7 +81,7 @@ export default (ipfs: IPFSHTTPClient) => {
     }
   }
 
-  async function writeThumbnail(thumbnail) {
+  async function writeThumbnail(thumbnail): Promise<CID> {
     debug(`Adding thumbnail to IPFS`);
     const ipfsThumbnail = await ipfs.add(thumbnail, {
       cidVersion: 1,
@@ -94,13 +93,13 @@ export default (ipfs: IPFSHTTPClient) => {
       throw Error("invalid thumbnail generated: 0 bytes length");
     }
 
-    return ipfsThumbnail;
+    return ipfsThumbnail.cid.toString();
   }
 
-  async function addToMFS(ipfsThumbnail: AddResult, path: Path) {
-    debug(`Adding thumbnail ${ipfsThumbnail.cid} to ${path}`);
+  async function addToMFS(cid: CID, path: Path) {
+    debug(`Adding thumbnail ${cid} to ${path}`);
     try {
-      ipfs.files.cp(ipfsThumbnail.cid, path, { flush: false });
+      ipfs.files.cp(cid, path, { flush: false });
     } catch (e) {
       if (
         e.name === "HTTPError" &&

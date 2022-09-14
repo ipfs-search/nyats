@@ -1,10 +1,11 @@
 require:
   - "mocha-suppress-logs"
 spec:
-  - "test/**/*.spec.*"
-extension:
-  - "ts"
-# https://github.com/mochajs/mocha-examples/issues/47
+  - "test/**/*.spec.js"
 node-option:
   - "experimental-specifier-resolution=node"
-  - "loader=ts-node/esm"
+# Stubbing in ts seems a nightmare.
+# extension:
+# - "ts"
+# https://github.com/mochajs/mocha-examples/issues/47
+# - "loader=ts-node/esm"

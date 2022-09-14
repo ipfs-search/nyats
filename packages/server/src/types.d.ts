@@ -27,3 +27,7 @@ export interface Dimensions {
 export interface ThumbnailRequest extends Resource, Dimensions {
   type?: Type;
 }
+
+export interface Thumbnailer {
+  (request: ThumbnailRequest): Promise<URL>;
+}
