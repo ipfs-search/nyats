@@ -22,6 +22,9 @@
     "url": "git+https://github.com/ipfs-search/nyats.git"
   },
   "scripts": {
+    "clean": "rimraf lib/* coverage/*",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm run test",
     "build": "tsc",
     "lint:ts": "tsc --noEmit",
     "lint:eslint": "eslint src test",

@@ -14,7 +14,10 @@
   "scripts": {
     "bootstrap": "lerna bootstrap",
     "build": "lerna run build",
-    "test": "lerna run test"
+    "test": "lerna run test",
+    "lint": "lerna run lint",
+    "clean": "lerna run clean",
+    "publish": "lerna run publish"
   },
   "author": "Mathijs de Bruin",
   "license": "AGPL-3.0-or-later",
@@ -42,6 +45,7 @@
     "mocha": "^10.0.0",
     "nodemon": "^2.0.19",
     "prettier": "2.7.1",
+    "rimraf": "^3.0.2",
     "ts-node": "^10.9.1",
     "typescript": "^4.8.2"
   }
