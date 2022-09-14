@@ -6,26 +6,28 @@ import makeDebugger from "debug";
 const debug = makeDebugger("nyats:ffmpeg_extractor");
 const ffmpeg_debug = makeDebugger("nyats:ffmpeg");
 
+const ffmpegCommonParams = [
+  "-c:v",
+  "libwebp",
+  "-f",
+  "image2",
+  "-",
+  "-loglevel",
+  "info",
+  "-hide_banner",
+];
+
+const ffmpegTimeout = 60000; // 60s default timeout
+
 export async function ffmpegExtractor(params) {
-  const commonParams = [
-    "-c:v",
-    "libwebp",
-    "-f",
-    "image2",
-    "-",
-    "-loglevel",
-    "info",
-    "-hide_banner",
-  ];
+  const ffmpegParams = params.concat(ffmpegCommonParams);
 
-  const fullParams = params.concat(commonParams);
+  ffmpeg_debug("ffmpeg ", ffmpegParams.join(" "));
 
-  ffmpeg_debug("ffmpeg ", fullParams.join(" "));
-
-  const ffmpeg = childProcess.spawn(pathToFfmpeg, fullParams, {
+  const ffmpeg = childProcess.spawn(pathToFfmpeg, ffmpegParams, {
     encoding: "buffer",
     windowsHide: true,
-    timeout: 60000, // 30s timeout by default
+    timeout: ffmpegTimeout,
   });
 
   // Debug log stdout closing
@@ -34,13 +36,18 @@ export async function ffmpegExtractor(params) {
   });
 
   // Pipe stderr to debug
+  let stderr = [];
   ffmpeg.stderr.on("data", (data) => {
-    ffmpeg_debug(data.toString("utf8"));
+    const strData = data.toString("utf8");
+    stderr.push(strData);
+    ffmpeg_debug(strData);
   });
 
   ffmpeg.once("exit", (code) => {
     if (code !== 0) {
-      throw new Error(`ffmpeg process exited with code ${code}`);
+      throw new Error(`ffmpeg process exited with code ${code}`, {
+        cause: stderr.join(),
+      });
     }
   });
 
