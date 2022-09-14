@@ -16,6 +16,7 @@
     "build": "lerna run build",
     "test": "lerna run test",
     "lint": "lerna run lint",
+    "prettier": "prettier --check .",
     "clean": "lerna run clean",
     "publish": "lerna run publish"
   },
