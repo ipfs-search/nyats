@@ -7,10 +7,13 @@ import makeVideoThumbnailer from "./video_thumbnailer.js";
 import makeAudioThumbnailer from "./audio_thumbnailer.js";
 
 import { ipfsTimeout } from "./conf.js";
+import { Path, ThumbnailRequest, URL } from "./types.js";
+import { IPFSHTTPClient } from "ipfs-http-client";
+import { AddResult } from "ipfs-core-types/src/root.js";
 
 const debug = makeDebugger("nyats:thumbnailer");
 
-export default (ipfs) => {
+export default (ipfs: IPFSHTTPClient) => {
   const typeDetector = makeTypeDetector();
   const imageThumbnailer = makeImageThumbnailer();
   const videoThumbnailer = makeVideoThumbnailer();
@@ -20,19 +23,20 @@ export default (ipfs) => {
     return `/ipfs/${root}${path}`;
   }
 
-  async function getThumbnail(protocol, cid, typeHint, width, height) {
-    debug(`Retreiving ${cid} from IPFS`);
+  async function getThumbnail(request: ThumbnailRequest) {
+    const { protocol, cid, width, height } = request;
 
-    const input = await ipfs.cat(`/${protocol}/${cid}`, {
+    debug(`Retreiving ${cid} from IPFS`);
+    const input = ipfs.cat(`/${protocol}/${cid}`, {
       timeout: ipfsTimeout,
     });
 
     let stream = asyncIteratorToStream(input);
 
-    let type;
-    if (typeHint) {
-      debug(`Using type hint: ${typeHint}`);
-      type = typeHint;
+    let type: string;
+    if (request.type) {
+      debug(`Using type hint: ${request.type}`);
+      type = request.type;
     } else {
       [type, stream] = await typeDetector.detectType(stream);
       debug(`Detected type: ${type}`);
@@ -54,7 +58,7 @@ export default (ipfs) => {
     }
   }
 
-  async function getExistingThumbnail(path) {
+  async function getExistingThumbnail(path: Path) {
     // If the file already exists, don't generate again
     try {
       debug(`Checking for ${path} on MFS`);
@@ -93,7 +97,7 @@ export default (ipfs) => {
     return ipfsThumbnail;
   }
 
-  async function addToMFS(ipfsThumbnail, path) {
+  async function addToMFS(ipfsThumbnail: AddResult, path: Path) {
     debug(`Adding thumbnail ${ipfsThumbnail.cid} to ${path}`);
     try {
       ipfs.files.cp(ipfsThumbnail.cid, path, { flush: false });
@@ -114,10 +118,11 @@ export default (ipfs) => {
     return ipfs.files.flush("/");
   }
 
-  async function generateThumbnail(path, protocol, cid, type, width, height) {
+  async function generateThumbnail(path: Path, request: ThumbnailRequest): Promise<URL> {
+    const { protocol, cid, type, width, height } = request;
     debug(`Generating thumbnail for ${protocol}://${cid} of type ${type} at ${width}x${height}`);
 
-    const thumbnail = await getThumbnail(protocol, cid, type, width, height);
+    const thumbnail = await getThumbnail(request);
     const ipfsThumbnail = await writeThumbnail(thumbnail);
 
     await addToMFS(ipfsThumbnail, path);
@@ -126,7 +131,8 @@ export default (ipfs) => {
     return getURL(rootCid, path);
   }
 
-  return async (protocol, cid, type, width, height) => {
+  return async (request: ThumbnailRequest): Promise<URL> => {
+    const { protocol, cid, width, height } = request;
     assert.equal(protocol, "ipfs");
 
     const path = `/${cid}-${width}-${height}.webp`;
@@ -137,6 +143,6 @@ export default (ipfs) => {
       return existing;
     }
 
-    return generateThumbnail(path, protocol, cid, type, width, height);
+    return generateThumbnail(path, request);
   };
 };

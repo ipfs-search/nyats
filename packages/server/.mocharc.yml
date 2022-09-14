@@ -1,8 +1,7 @@
 require:
   - "mocha-suppress-logs"
 spec:
-  - "test/**/*.spec.ts"
-  - "test/**/*.spec.js"
+  - "test/**/*.spec.*"
 extension:
   - "ts"
 # https://github.com/mochajs/mocha-examples/issues/47

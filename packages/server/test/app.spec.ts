@@ -4,15 +4,19 @@ import sinon from "sinon";
 import request from "supertest";
 import path from "path";
 import fs from "fs";
+import { stubObject } from "ts-sinon";
+import { CID, IPFSHTTPClient } from "ipfs-http-client";
 
-import makeApp from "../lib/app.js";
-import makeThumbnailer from "../lib/thumbnailer.js";
-import { ipfsGateway } from "../lib/conf.js";
+import makeApp from "../src/app.js";
+import makeThumbnailer from "../src/thumbnailer.js";
+import { ipfsGateway } from "../src/conf.js";
+import ipfs from "../src/ipfs.js";
 
 import sharp from "sharp";
 
 // OpenAPI matcher
 import { chaiPlugin as matchApiSchema } from "api-contract-validator";
+
 const apiDefinitionsPath = path.resolve("../../openapi.yml");
 use(matchApiSchema({ apiDefinitionsPath }));
 
@@ -35,30 +39,23 @@ describe("app integration tests", function () {
   let response, addStub, statStub, app, grapefruit;
 
   beforeEach(async function () {
-    statStub = sinon.stub();
-    statStub.withArgs("/").returns({
+    grapefruit = await grapefruitStream();
+
+    const ipfsMock = stubObject<IPFSHTTPClient>(ipfs, {
+      cat: grapefruit,
+      version: { version: "0.99.0" },
+      add: {
+        cid: CID.parse("QmPwG1cSwtz19rMh81Zfii5iw4jSAC8yLK7byY5U7g38gs"),
+        size: 34,
+        path: "",
+      },
+    });
+
+    ipfsMock.files.stat.withArgs("/").returns({
       cid: rootCid,
     });
-    addStub = sinon.stub().resolves({
-      cid: "thumbnailCid",
-      size: 34,
-    });
-
-    grapefruit = await grapefruitStream();
-    const catStub = sinon.stub().resolves(grapefruit);
-    const cpStub = sinon.stub().resolves();
-    const flushStub = sinon.stub().resolves(newRootCid);
-
-    const ipfsMock = {
-      version: sinon.stub().resolves({ version: "0.99.0" }),
-      add: addStub,
-      cat: catStub,
-      files: {
-        stat: statStub,
-        cp: cpStub,
-        flush: flushStub,
-      },
-    };
+    ipfsMock.files;
+    ipfsMock.files.flush.resolves(sinon.promise().resolve(CID.parse(newRootCid)));
 
     const thumbnailer = makeThumbnailer(ipfsMock);
     app = request(makeApp(thumbnailer));

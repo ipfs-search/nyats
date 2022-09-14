@@ -24,7 +24,6 @@
     "start": "ts-node src/cluster.js",
     "start:watch": "nodemon src/cluster.js",
     "clean": "rimraf lib/* coverage/*",
-    "prepare": "npm run build",
     "prepublishOnly": "npm run test",
     "build": "tsc",
     "lint:ts": "tsc --noEmit",
@@ -56,7 +55,8 @@
     "mocha-suppress-logs": "^0.3.1",
     "serve-handler": "^6.1.3",
     "sinon": "^14.0.0",
-    "supertest": "^6.2.4"
+    "supertest": "^6.2.4",
+    "ts-sinon": "^2.0.2"
   },
   "dependencies": {
     "@types/mocha": "^9.1.1",
