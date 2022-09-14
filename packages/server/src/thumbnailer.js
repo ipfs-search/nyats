@@ -44,10 +44,10 @@ export default (ipfs) => {
         return imageThumbnailer(stream, width, height);
 
       case "video":
-        return videoThumbnailer.makeThumbnail(`http://localhost:8080/ipfs/${cid}`, width, height);
+        return videoThumbnailer(`http://localhost:8080/ipfs/${cid}`, width, height);
 
       case "audio":
-        return audioThumbnailer.makeThumbnail(`http://localhost:8080/ipfs/${cid}`, width, height);
+        return audioThumbnailer(`http://localhost:8080/ipfs/${cid}`, width, height);
 
       default:
         throw Error(`unsupported type: ${type}`);

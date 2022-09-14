@@ -1,4 +1,4 @@
-import { promise } from "stream-mmmagic";
+import { default as mmagic } from "stream-mmmagic";
 import micromatch from "micromatch";
 import contentTypes from "./content_types.js";
 
@@ -28,7 +28,8 @@ export default () => {
 
   return {
     async detectType(input) {
-      const [mime, output] = await promise(input, { peekBytes: 1024 });
+      const [mime, output] = await mmagic.promise(input, { peekBytes: 1024 });
+      // @ts-expect-error https://github.com/seangarner/node-stream-mmmagic/pull/19
       const type = typeFromMime(mime.type);
       return [type, output];
     },

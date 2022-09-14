@@ -25,7 +25,6 @@ export async function ffmpegExtractor(params) {
   ffmpeg_debug("ffmpeg ", ffmpegParams.join(" "));
 
   const ffmpeg = childProcess.spawn(pathToFfmpeg, ffmpegParams, {
-    encoding: "buffer",
     windowsHide: true,
     timeout: ffmpegTimeout,
   });
