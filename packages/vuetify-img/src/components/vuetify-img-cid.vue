@@ -1,32 +1,21 @@
-<script setup>
-defineProps({
-  cid: {
-    type: String,
-    required: true,
-  },
-  type: {
-    type: String,
-    required: false,
-  },
-  height: {
-    type: Number,
-    required: false,
-  },
-  width: {
-    type: Number,
-    required: false,
-  },
-});
-</script>
-
 <template>
-  <v-img ref="img" :src="thumbURL" v-bind="$props" @error="thumbErr">
+	<v-img ref="img" :src="thumbURL" v-bind="$props" @error="thumbErr">
     <template #placeholder>
       <slot v-if="generateErr" name="failed" />
-      <slot v-else name="placeholder" />
+      <slot v-else name="placeholder" >
+        <v-row class="fill-height ma-0" align="center" justify="center">
+          <v-progress-circular indeterminate />
+        </v-row>
+      </slot>
     </template>
 
-    <template #failed> <slot name="failed" /> </template>
+    <template #failed>
+      <slot name="failed" >
+        <v-row class="fill-height ma-0" align="center" justify="center">
+          <v-icon color="grey" size="large" :icon="mdiRobotDead" />
+        </v-row>
+      </slot>
+    </template>
 
     <template #default>
       <slot name="default" />
@@ -35,6 +24,7 @@ defineProps({
 </template>
 
 <script>
+import { cid as isCID } from "is-ipfs";
 import { DefaultConfig, IPNSThumbnailURL, GenerateThumbnailURL } from "nyats-client";
 
 const config = {
@@ -44,6 +34,27 @@ const config = {
 };
 
 export default {
+  props: {
+    cid: {
+      type: String,
+      required: true,
+    },
+    type: {
+      type: String,
+      required: false,
+      default: "",
+    },
+    height: {
+      type: Number,
+      required: false,
+      default: 100,
+    },
+    width: {
+      type: Number,
+      required: false,
+      default: 100,
+    },
+  },
   data: () => ({
     ipnsErr: false,
     generateErr: false,
@@ -59,6 +70,7 @@ export default {
   computed: {
     thumbURL() {
       if (this.thumbWidth && this.thumbHeight) {
+        if(!isCID(this.cid)) return ""
         if (this.ipnsErr) {
           console.debug("Generating new thumbnail", this);
           return GenerateThumbnailURL(
@@ -72,6 +84,7 @@ export default {
 
         console.debug("Attempting to load IPNS thumbail", this);
         console.log(this.cid, this.thumbWidth, this.thumbHeight, config);
+
         return IPNSThumbnailURL(this.cid, this.thumbWidth, this.thumbHeight, config);
       } else {
         console.warn("No thumbnail dimensions known, not returning URL.", this);
