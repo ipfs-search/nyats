@@ -98,7 +98,10 @@ export default (ipfs) => {
     try {
       ipfs.files.cp(ipfsThumbnail.cid, path, { flush: false });
     } catch (e) {
-      if (e.name === "HTTPError" && "directory already has entry by that name" in e.message) {
+      if (
+        e.name === "HTTPError" &&
+        e.messages.includes("directory already has entry by that name")
+      ) {
         console.warn("Pre-existing thumbnail in ${path}", e.message);
         return;
       }
