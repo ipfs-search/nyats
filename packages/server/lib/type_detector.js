@@ -1,6 +1,6 @@
-import { promise } from 'stream-mmmagic';
-import micromatch from 'micromatch';
-import contentTypes from './content_types.js';
+import { promise } from "stream-mmmagic";
+import micromatch from "micromatch";
+import contentTypes from "./content_types.js";
 
 function compileTypeRe() {
   const typeRe = {};
