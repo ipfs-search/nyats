@@ -1,9 +1,21 @@
 import process from "node:process";
 import express from "express";
 import { strict as assert } from "assert";
+import healthcheck from "express-healthcheck";
+import urlJoin from "url-join";
+import { ipfsGateway } from "./conf.js";
 
 import makeDebugger from "debug";
 const debug = makeDebugger("nyats:server");
+
+function getGatewayURL(req, ipfsPath) {
+  // We can use the referer to derive whether we've been requested from a gateway
+  // and then use this to generate URL's.
+  const referer = req.headers["referer"];
+  debug(referer);
+
+  return urlJoin(ipfsGateway, ipfsPath);
+}
 
 export default (thumbnailer) => {
   const app = express();
@@ -19,10 +31,14 @@ export default (thumbnailer) => {
     );
 
     try {
-      const url = await thumbnailer(protocol, cid, type, parseInt(width), parseInt(height));
-      assert(url);
-      debug(`Redirecting to ${url}`);
-      res.redirect(301, url);
+      const ipfsPath = await thumbnailer(protocol, cid, type, parseInt(width), parseInt(height));
+      assert(ipfsPath);
+
+      res.setHeader("x-ipfs-path", ipfsPath);
+      const redirectURL = getGatewayURL(req, ipfsPath);
+
+      debug(`Redirecting to ${redirectURL}`);
+      res.redirect(301, redirectURL);
     } catch (e) {
       // ExpressJS <5 doesn't properly catch async errors (yet)
       next(e);
@@ -52,6 +68,8 @@ export default (thumbnailer) => {
 
     error(res, 500, err);
   });
+
+  app.use("/healthcheck", healthcheck());
 
   return app;
 };

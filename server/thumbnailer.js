@@ -6,15 +6,17 @@ import makeTypeDetector from "./type_detector.js";
 import makeImageThumbnailer from "./image_thumbnailer.js";
 import makeVideoThumbnailer from "./video_thumbnailer.js";
 
+import { ipfsTimeout } from "./conf.js";
+
 const debug = makeDebugger("nyats:thumbnailer");
 
-export default (ipfs, { ipfsGateway = "https://gateway.ipfs.io", ipfsTimeout = 10000 }) => {
+export default (ipfs) => {
   const typeDetector = makeTypeDetector();
   const imageThumbnailer = makeImageThumbnailer();
   const videoThumbnailer = makeVideoThumbnailer();
 
   async function getURL(root, path) {
-    return `${ipfsGateway}/ipfs/${root}${path}`;
+    return `/ipfs/${root}${path}`;
   }
 
   async function getThumbnail(protocol, cid, typeHint, width, height) {
@@ -89,10 +91,17 @@ export default (ipfs, { ipfsGateway = "https://gateway.ipfs.io", ipfsTimeout = 1
   }
 
   async function addToMFS(ipfsThumbnail, path) {
-    // TODO: Soft fail here
-    // Ref: HTTPError: cp: cannot put node in path /QmWR97DZDJSxQUjKx7EYBhsDWriweYSiM2t1ngPSkZ9HnM-161-90.jpg: directory already has entry by that name
     debug(`Adding thumbnail ${ipfsThumbnail.cid} to ${path}`);
-    return ipfs.files.cp(ipfsThumbnail.cid, path, { flush: false });
+    try {
+      ipfs.files.cp(ipfsThumbnail.cid, path, { flush: false });
+    } catch (e) {
+      if (e.name === "HTTPError" && "directory already has entry by that name" in e.message) {
+        console.warn("Pre-existing thumbnail in ${path}", e.message);
+        return;
+      }
+
+      throw e;
+    }
   }
 
   async function flushRootCID() {
@@ -104,6 +113,7 @@ export default (ipfs, { ipfsGateway = "https://gateway.ipfs.io", ipfsTimeout = 1
 
     const thumbnail = await getThumbnail(protocol, cid, type, width, height);
     const ipfsThumbnail = await writeThumbnail(thumbnail);
+
     await addToMFS(ipfsThumbnail, path);
     const rootCid = await flushRootCID();
 
