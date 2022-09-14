@@ -1,13 +1,7 @@
 # See https://help.github.com/ignore-files/ for more about ignoring files.
 
-# compiled output
-dist/
-tmp/
-
 # dependencies
-bower_components/
 node_modules/
-.package-lock.json
 
 # misc
 .env*
@@ -16,10 +10,12 @@ node_modules/
 connect.lock
 coverage/
 libpeerconnection.log
-npm-debug.log*
+npm-debug.log
+lerna-debug.log
 testem.log
 yarn-error.log
 
 # local
 **/.DS_Store
+**/lib
 .idea
