@@ -12,63 +12,63 @@ import { nyatsHost, nyatsPort, nyatsProcesses, updateInterval, ipfsGateway } fro
 const debug = debuggerFactory("nyats:cluster");
 
 process.on("uncaughtException", (err) => {
-	// This is to prevent the server from crashing on timeout.
-	// Somehow IPFS errors seem to both result in a rejected promise as well as thrown.
-	// Results from here: https://github.com/ipfs/js-ipfs/blob/master/packages/ipfs-core-utils/src/with-timeout-option.js
-	if (err.name === "TimeoutError") return;
+  // This is to prevent the server from crashing on timeout.
+  // Somehow IPFS errors seem to both result in a rejected promise as well as thrown.
+  // Results from here: https://github.com/ipfs/js-ipfs/blob/master/packages/ipfs-core-utils/src/with-timeout-option.js
+  if (err.name === "TimeoutError") return;
 });
 
 async function checkIPFS() {
-	try {
-		const version = await ipfs.version();
-		console.log("IPFS daemon version:", version.version);
-	} catch (e) {
-		console.log("Unable to get IPFS daemon version. Is the IPFS daemon running?");
-		throw e;
-	}
+  try {
+    const version = await ipfs.version();
+    console.log("IPFS daemon version:", version.version);
+  } catch (e) {
+    console.log("Unable to get IPFS daemon version. Is the IPFS daemon running?");
+    throw e;
+  }
 }
 
 function forkWorkers() {
-	// Start workers and listen for messages containing notifyRequest
-	debug(`Starting ${nyatsProcesses} worker processes.`);
+  // Start workers and listen for messages containing notifyRequest
+  debug(`Starting ${nyatsProcesses} worker processes.`);
 
-	let workerCount = 0;
-	cluster.on("listening", (worker, address) => {
-		workerCount++;
+  let workerCount = 0;
+  cluster.on("listening", (worker, address) => {
+    workerCount++;
 
-		debug("Started worker %d: %s", workerCount, worker);
+    debug("Started worker %d: %s", workerCount, worker);
 
-		if (workerCount == nyatsProcesses) {
-			console.log(
-				`${workerCount} workers started and listening on http://${address.address}:${address.port}`
-			);
-		}
-	});
+    if (workerCount == nyatsProcesses) {
+      console.log(
+        `${workerCount} workers started and listening on http://${address.address}:${address.port}`
+      );
+    }
+  });
 
-	cluster.on("exit", function (worker) {
-		console.log(`worker ${worker.process.pid} died.\nshutting down server.`);
-		exit(1);
-	});
+  cluster.on("exit", function (worker) {
+    console.log(`worker ${worker.process.pid} died.\nshutting down server.`);
+    exit(1);
+  });
 
-	for (var i = 0; i < nyatsProcesses; i++) {
-		debug(i);
-		cluster.fork();
-	}
+  for (var i = 0; i < nyatsProcesses; i++) {
+    debug(i);
+    cluster.fork();
+  }
 }
 
 function startWorker() {
-	const thumbnailer = makeThumbnailer(ipfs);
-	const app = makeApp(thumbnailer);
+  const thumbnailer = makeThumbnailer(ipfs);
+  const app = makeApp(thumbnailer);
 
-	app.listen(nyatsPort, nyatsHost);
+  app.listen(nyatsPort, nyatsHost);
 }
 
 if (cluster.isMaster) {
-	await checkIPFS();
-	console.log(`IPFS gateway: ${ipfsGateway}`);
+  await checkIPFS();
+  console.log(`IPFS gateway: ${ipfsGateway}`);
 
-	forkWorkers();
-	startIPNSPublisher(ipfs, updateInterval);
+  forkWorkers();
+  startIPNSPublisher(ipfs, updateInterval);
 } else {
-	startWorker();
+  startWorker();
 }
