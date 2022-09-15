@@ -29,9 +29,9 @@
     "lint:ts": "tsc --noEmit",
     "lint:eslint": "eslint src test",
     "lint": "npm run lint:ts && npm run lint:eslint",
-    "test": "npm run build && mocha",
-    "test:watch": "nodemon --exec npm run build && mocha",
-    "test:cover": "npm run build && c8 --src src --all mocha"
+    "test": "mocha",
+    "test:watch": "nodemon --exec mocha",
+    "test:cover": "c8 --src src --all mocha"
   },
   "bugs": {
     "url": "https://github.com/ipfs-search/nyats/issues"

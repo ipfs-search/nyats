@@ -2,9 +2,9 @@
 import sharp from "sharp";
 import { expect } from "chai";
 
-import makeThumbnailer from "../lib/image_thumbnailer.js";
-import { animateThumbnails } from "../lib/conf.js";
-import { getStream } from "./util.js";
+import makeThumbnailer from "../src/image_thumbnailer";
+import { animateThumbnails } from "../src/conf";
+import { getStream } from "./util";
 
 const thumbnailer = makeThumbnailer();
 const tests = [

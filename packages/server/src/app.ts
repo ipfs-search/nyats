@@ -6,7 +6,7 @@ import urlJoin from "url-join";
 import { ipfsGateway } from "./conf.js";
 
 import makeDebugger from "debug";
-import { Type, Protocol, Thumbnailer, ThumbnailRequest } from "./types.js";
+import { Type, Protocol, Thumbnailer, ThumbnailRequest } from "./types";
 const debug = makeDebugger("nyats:server");
 
 function getGatewayURL(req, ipfsPath) {
