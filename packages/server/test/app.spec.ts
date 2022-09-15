@@ -3,7 +3,8 @@ import { use, expect } from "chai";
 import request from "supertest";
 import path from "path";
 import fs from "fs";
-import sinon, { stubInterface } from "ts-sinon";
+import sinon from "sinon";
+import { stubInterface } from "ts-sinon";
 import type { IPFS } from "ipfs-core-types";
 
 import { CID } from "multiformats/cid";
@@ -33,8 +34,8 @@ const width = 100;
 const height = 100;
 const protocol = "ipfs";
 const getURL = `/thumbnail/${protocol}/${cid}/${width}/${height}`;
-const rootCid = "rootCid";
-const newRootCid = "newRootCid";
+const rootCid = "Qmc1QXsKgyQNjpbcvFeuSw5FJ6zYZ41pxcR4zkPjMPDCar";
+const newRootCid = "QmfTg8E3YRx7PwcnXpPGWRJsgpLUqPTLvyrEJEP7SdB8FH";
 const thumbPath = `/${cid}-${width}-${height}.webp`;
 const thumbPathExists = `/${cid2}-${width}-${height}.webp`;
 
