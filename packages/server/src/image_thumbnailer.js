@@ -1,7 +1,7 @@
 import debuggerFactory from "debug";
 import sharp from "sharp";
 
-import { animateThumbnails } from "./conf.js";
+import { animateThumbnails, nyatsMaxInputHeight, nyatsMaxInputWidth } from "./conf.js";
 
 const debug = debuggerFactory("nyats:image_thumbnailer");
 
@@ -38,6 +38,11 @@ async function makeThumbnail(stream, width, height) {
   const metadata = await image.clone().metadata();
   debug("Got metadata:", metadata);
 
+  // Validate input data, prevent PNG bombs and the likes.
+  if (metadata.height > nyatsMaxInputHeight || metadata.width > nyatsMaxInputWidth) {
+    throw ValidationError;
+  }
+
   let webpOptions = {
     lossless: isLossless(metadata),
   };
@@ -60,6 +65,8 @@ async function makeThumbnail(stream, width, height) {
 
   return transformer;
 }
+
+export const ValidationError = new Error("Invalid input data.");
 
 export default function thumbnailerFactory() {
   return makeThumbnail;
