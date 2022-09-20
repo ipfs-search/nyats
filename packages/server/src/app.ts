@@ -2,8 +2,10 @@ import process from "node:process";
 import express from "express";
 import { strict as assert } from "assert";
 import healthcheck from "express-healthcheck";
+import { param, query, validationResult, matchedData } from "express-validator";
 import urlJoin from "url-join";
-import { ipfsGateway } from "./conf.js";
+import isIPFS from "is-ipfs";
+import { ipfsGateway, nyatsMaxOutputHeight, nyatsMaxOutputWidth } from "./conf.js";
 
 import makeDebugger from "debug";
 import { Type, Protocol, Thumbnailer, ThumbnailRequest } from "./types";
@@ -21,37 +23,48 @@ function getGatewayURL(req, ipfsPath) {
 export default (thumbnailer: Thumbnailer): express.Express => {
   const app = express();
 
-  app.get("/thumbnail/:protocol/:cid/:width/:height/", async (req, res, next) => {
-    // TODO: Validation
-    // https://express-validator.github.io/docs/
-    const { protocol, cid, width, height } = req.params;
-    const { type } = req.query;
+  app.get(
+    "/thumbnail/:protocol/:cid/:width/:height/",
+    async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+      await param("protocol").isIn(Object.values(Protocol)).run(req);
+      await param("width").isInt({ min: 16, max: nyatsMaxOutputWidth }).toInt().run(req);
+      await param("height").isInt({ min: 16, max: nyatsMaxOutputHeight }).toInt().run(req);
+      await query("type").isIn(Object.values(Type)).run(req);
+      await param("cid")
+        .custom((v) => isIPFS.cid(v))
+        .run(req);
 
-    debug(
-      `Received thumbnail request for ${protocol}://${cid} at ${width}x${height} of type ${type}`
-    );
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
 
-    try {
-      const thumbReq: ThumbnailRequest = {
-        protocol: Protocol.IPFS,
-        cid: cid,
-        type: Type[type as string],
-        width: parseInt(width),
-        height: parseInt(height),
-      };
-      const ipfsPath = await thumbnailer(thumbReq);
-      assert(ipfsPath);
+      const data = matchedData(req);
+      const { protocol, cid, width, height, type } = data;
 
-      res.setHeader("x-ipfs-path", ipfsPath);
-      const redirectURL = getGatewayURL(req, ipfsPath);
+      debug(
+        `Received thumbnail request for ${protocol}://${cid} at ${width}x${height} of type ${type}`
+      );
 
-      debug(`Redirecting to ${redirectURL}`);
-      res.redirect(301, redirectURL);
-    } catch (e) {
-      // ExpressJS <5 doesn't properly catch async errors (yet)
-      next(e);
+      console.log("Got protocol", protocol);
+      console.log("Protocol", Protocol);
+
+      try {
+        const thumbReq: ThumbnailRequest = data as ThumbnailRequest;
+        const ipfsPath = await thumbnailer(thumbReq);
+        assert(ipfsPath);
+
+        res.setHeader("x-ipfs-path", ipfsPath);
+        const redirectURL = getGatewayURL(req, ipfsPath);
+
+        debug(`Redirecting to ${redirectURL}`);
+        res.redirect(301, redirectURL);
+      } catch (e) {
+        // ExpressJS <5 doesn't properly catch async errors (yet)
+        next(e);
+      }
     }
-  });
+  );
 
   function error(res, code, err) {
     console.error(`${code}: ${err}`);

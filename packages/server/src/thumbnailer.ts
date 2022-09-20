@@ -7,7 +7,7 @@ import makeVideoThumbnailer from "./video_thumbnailer.js";
 import makeAudioThumbnailer from "./audio_thumbnailer.js";
 
 import { ipfsTimeout } from "./conf.js";
-import { CID, Path, ThumbnailRequest, URL } from "./types.js";
+import { CID, Path, Type, Protocol, ThumbnailRequest, URL } from "./types.js";
 import type { IPFS } from "ipfs-core-types";
 
 const debug = makeDebugger("nyats:thumbnailer");
@@ -23,7 +23,9 @@ export default (ipfs: IPFS) => {
   }
 
   async function getThumbnail(request: ThumbnailRequest) {
-    const { protocol, cid, width, height } = request;
+    const { cid, width, height } = request;
+    const protocol = Protocol[request.protocol];
+    let type: string = Type[request.type];
 
     debug(`Retreiving ${cid} from IPFS`);
     const input = ipfs.cat(`/${protocol}/${cid}`, {
@@ -32,11 +34,9 @@ export default (ipfs: IPFS) => {
 
     const stream = Readable.from(input);
 
-    let type: string;
     let imgstream: NodeJS.ReadableStream;
-    if (request.type) {
-      debug(`Using type hint: ${request.type}`);
-      type = request.type;
+    if (type) {
+      debug(`Using type hint: ${type}`);
     } else {
       [type, imgstream] = await typeDetector.detectType(stream);
       debug(`Detected type: ${type}`);
@@ -132,8 +132,7 @@ export default (ipfs: IPFS) => {
   }
 
   return async (request: ThumbnailRequest): Promise<URL> => {
-    const { protocol, cid, width, height } = request;
-    assert.equal(protocol, "ipfs");
+    const { cid, width, height } = request;
 
     const path = `/${cid}-${width}-${height}.webp`;
 

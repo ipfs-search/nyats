@@ -15,7 +15,7 @@ export enum Type {
 }
 
 export interface Resource {
-  protocol: Protocol;
+  protocol: keyof typeof Protocol;
   cid: CID;
 }
 
@@ -25,7 +25,7 @@ export interface Dimensions {
 }
 
 export interface ThumbnailRequest extends Resource, Dimensions {
-  type?: Type;
+  type?: keyof typeof Type;
 }
 
 export interface Thumbnailer {
