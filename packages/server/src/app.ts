@@ -33,8 +33,8 @@ export default (thumbnailer: Thumbnailer): express.Express => {
 
     try {
       const thumbReq: ThumbnailRequest = {
-        protocol: Protocol[protocol],
-        cid,
+        protocol: Protocol.IPFS,
+        cid: cid,
         type: Type[type as string],
         width: parseInt(width),
         height: parseInt(height),

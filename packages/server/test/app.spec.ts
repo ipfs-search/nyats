@@ -1,4 +1,3 @@
-"strict";
 import { use, expect } from "chai";
 import request from "supertest";
 import path from "path";
@@ -29,7 +28,7 @@ async function grapefruitStream() {
 }
 
 const cid = "QmcRD4wkPPi6dig81r5sLj9Zm1gDCL4zgpEj9CfuRrGbzF";
-const cid2 = "QmPwG1cSwtz19rMh81Zfii5iw4jSAC8yLK7byY5U7g38gs";
+const thumbnailCid = "QmPwG1cSwtz19rMh81Zfii5iw4jSAC8yLK7byY5U7g38gs";
 const width = 100;
 const height = 100;
 const protocol = "ipfs";
@@ -37,38 +36,40 @@ const getURL = `/thumbnail/${protocol}/${cid}/${width}/${height}`;
 const rootCid = "Qmc1QXsKgyQNjpbcvFeuSw5FJ6zYZ41pxcR4zkPjMPDCar";
 const newRootCid = "QmfTg8E3YRx7PwcnXpPGWRJsgpLUqPTLvyrEJEP7SdB8FH";
 const thumbPath = `/${cid}-${width}-${height}.webp`;
-const thumbPathExists = `/${cid2}-${width}-${height}.webp`;
+const thumbPathExists = `/${cid}-${width}-${height}.webp`;
 
-// Setup IPFS mock
-const ipfsMock = stubInterface<IPFS>();
 let grapefruit: fs.ReadStream;
-ipfsMock.cat.resolves(grapefruit);
-ipfsMock.version.resolves({ version: "0.99.0" });
-ipfsMock.add.resolves({
-  cid: CID.parse(cid2),
-  size: 34,
-  path: "",
-});
 
 const notFoundError = new Error("file does not exist");
 notFoundError.name = "not found";
 
-ipfsMock.files.stat = sinon
-  .stub()
-  .withArgs("/")
-  .returns({ cid: CID.parse(rootCid) })
-  .withArgs(thumbPath)
-  .throws(notFoundError)
-  .withArgs(thumbPathExists)
-  .resolves();
-
-ipfsMock.files.flush = sinon.stub().resolves(newRootCid);
-
 describe("app integration tests", function () {
+  let ipfsMock;
+  let statStub;
   let response, app;
 
   beforeEach(async function () {
     grapefruit = await grapefruitStream();
+
+    ipfsMock = stubInterface<IPFS>();
+
+    ipfsMock.cat.returns(grapefruit);
+    ipfsMock.version.resolves({ version: "0.99.0" });
+    ipfsMock.add.resolves({
+      cid: CID.parse(thumbnailCid),
+      size: 34,
+      path: "",
+    });
+
+    statStub = sinon
+      .stub()
+      .onSecondCall()
+      .returns({ cid: CID.parse(rootCid) });
+
+    ipfsMock.files.flush = sinon.stub().resolves(newRootCid);
+    ipfsMock.files.cp = sinon.stub().resolves();
+    ipfsMock.files.stat = statStub;
+
     const thumbnailer = makeThumbnailer(ipfsMock);
     app = request(makeApp(thumbnailer));
   });
@@ -92,6 +93,10 @@ describe("app integration tests", function () {
   }
 
   describe("Generated image thumbnail", function () {
+    beforeEach(function () {
+      statStub.onFirstCall().throws(notFoundError);
+    });
+
     it("Satisfies OpenAPI spec", expectOpenAPISchema());
     it(
       "Returns correct thumbnail URL",
@@ -112,6 +117,10 @@ describe("app integration tests", function () {
   });
 
   describe("Existing image thumbnail", function () {
+    beforeEach(function () {
+      statStub.onFirstCall().resolves();
+    });
+
     it("Satisfies OpenAPI spec", expectOpenAPISchema());
     it(
       "Returns correct thumbnail URL",

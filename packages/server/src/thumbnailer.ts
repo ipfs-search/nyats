@@ -1,5 +1,5 @@
 import { strict as assert } from "assert";
-import asyncIteratorToStream from "async-iterator-to-stream";
+import { Readable } from "stream";
 import makeDebugger from "debug";
 import makeTypeDetector from "./type_detector.js";
 import makeImageThumbnailer from "./image_thumbnailer.js";
@@ -30,21 +30,22 @@ export default (ipfs: IPFS) => {
       timeout: ipfsTimeout,
     });
 
-    let stream = asyncIteratorToStream(input);
+    const stream = Readable.from(input);
 
     let type: string;
+    let imgstream: NodeJS.ReadableStream;
     if (request.type) {
       debug(`Using type hint: ${request.type}`);
       type = request.type;
     } else {
-      [type, stream] = await typeDetector.detectType(stream);
+      [type, imgstream] = await typeDetector.detectType(stream);
       debug(`Detected type: ${type}`);
     }
 
     debug(`Generating ${width}x${height} thumbnail`);
     switch (type) {
       case "image":
-        return imageThumbnailer(stream, width, height);
+        return imageThumbnailer(imgstream, width, height);
 
       case "video":
         return videoThumbnailer(`http://localhost:8080/ipfs/${cid}`, width, height);
