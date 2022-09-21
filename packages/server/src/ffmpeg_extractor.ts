@@ -43,9 +43,8 @@ function enableDebugging(process: ChildProcessWithoutNullStreams) {
   process.once("exit", (code) => {
     if (code !== 0) {
       const output = stderr.join();
-
-      console.error(output);
-      throw new Error(`ffmpeg exited with code ${code}`, {
+      console.log(output);
+      throw new Error(`ffmpeg exited with code ${code}: ${output}`, {
         cause: output,
       });
     }
