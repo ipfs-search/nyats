@@ -1,11 +1,11 @@
 {
-	"compilerOptions": {
-		"target": "ESNext",
-		"module": "ESNext",
-		"moduleResolution": "Node",
-		"strict": true,
-		"skipLibCheck": true,
-		"sourceMap": true,
-		"esModuleInterop": true
-	}
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "strict": true,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "esModuleInterop": true
+  }
 }
