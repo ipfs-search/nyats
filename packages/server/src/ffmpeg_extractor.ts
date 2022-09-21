@@ -131,8 +131,6 @@ export const extractFirstFrame: ffmpegThumbnailer = async function (
 };
 
 export const extractCoverArt = async function (url: string, width: number, height: number) {
-  // TODO: Use cover art archive as secondary source.
-  // https://coverartarchive.org/release/79de4fa8-102c-402f-8040-3f1aa6d0c1b4/front
   debug("Extract cover art for streams with attached pictures, thumbnails or cover art.");
 
   return ffmpegExtractor([
