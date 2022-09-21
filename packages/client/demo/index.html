@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>nyats-client demo</title>
+  </head>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
+        sans-serif;
+    }
+    .center {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      -webkit-transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%);
+    }
+  </style>
+  <script type="importmap">
+    {
+      "imports": {
+        "url-join": "https://cdn.jsdelivr.net/npm/url-join@5.0.0/lib/url-join.min.js"
+      }
+    }
+  </script>
+  <script type="module" defer>
+    import { IPNSThumbnailURL, GenerateThumbnailURL } from "../lib/client.js";
+    const imgTag = document.getElementById("imgDemo"),
+      cidField = document.getElementById("cid"),
+      widthField = document.getElementById("width"),
+      heightField = document.getElementById("height"),
+      form = document.getElementById("form");
+
+    let imgCid = cidField.value,
+      width = widthField.value,
+      height = heightField.value;
+    let triedGenerating = false;
+
+    form.onsubmit = (e) => {
+      triedGenerating = false;
+      imgCid = cidField.value;
+      width = widthField.value;
+      height = heightField.value;
+      imgTag.width = width;
+      imgTag.height = height;
+      imgTag.src = IPNSThumbnailURL(imgCid, width, height);
+
+      e.preventDefault();
+    };
+
+    imgTag.width = width;
+    imgTag.height = height;
+    imgTag.src = IPNSThumbnailURL(imgCid, width, height);
+
+    imgTag.onerror = () => {
+      if (!triedGenerating) {
+        console.log(
+          "Unable to load cached thumbnail, retrieving generated thumbnail."
+        );
+        imgTag.src = GenerateThumbnailURL(imgCid, width, height, "image");
+        triedGenerating = true;
+      } else {
+        console.log("Error loading generated thumbnail.");
+      }
+    };
+  </script>
+  <body>
+    <div class="center">
+      <h1>nyats thumbnailer demo</h1>
+      <form id="form">
+        <label for="width">Width</label>
+        <input id="width" name="width" type="text" value="400" />
+        <label for="height">Height</label>
+        <input id="height" name="height" type="text" value="400" />
+
+        <label for="cid">CID</label>
+        <input
+          id="cid"
+          name="cid"
+          type="text"
+          value="QmVP4JwZzM59TBzNKYu3LrrsQGohABxUoRLgYycRjF8A7d"
+        />
+        <button type="submit">Update</button>
+      </form>
+      <div>
+        <h2>Thumbnail</h2>
+        <img id="imgDemo" width="200" height="200" />
+      </div>
+    </div>
+  </body>
+</html>
