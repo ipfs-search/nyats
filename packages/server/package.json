@@ -1,6 +1,6 @@
 {
   "name": "nyats-server",
-  "version": "0.2.0-alpha.1",
+  "version": "0.2.0-alpha.2",
   "description": "nyats (Not Yet Another Thumbnail Service) client-side caching IPFS thumbnailing server. Generates thumbnails for IPFS CID's, writes thumbnails to IPFS, adds them to MFS, publishes IPNS hash and returns redirect to thumbnail in MFS, allowing for efficient client-side caching.",
   "keywords": [
     "nyats",
