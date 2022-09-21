@@ -8,6 +8,7 @@ import {
   ResourceType,
   IPNSThumbnailURL,
   GenerateThumbnailURL,
+  GetClient,
 } from "../src/client";
 
 const testHash = "QmfQVstTkoG7ipSkCH2J9hjS9AssQmexeXDEjs7urQavcC";
@@ -19,6 +20,8 @@ const testConfig: ClientConfig = {
   gatewayURL: "http://localhost:8080",
   endpoint: "https://endpoint.com/path",
 };
+
+const testClient = GetClient(testConfig);
 
 describe("IPNSThumbnailURL", function () {
   const filename = `${testHash}-${testWidth}-${testHeight}.webp`;
@@ -35,7 +38,7 @@ describe("IPNSThumbnailURL", function () {
 
   describe("with custom configuration", function () {
     it("returns correct URL", function () {
-      const redirectURL = IPNSThumbnailURL(testHash, testWidth, testHeight, testConfig);
+      const redirectURL = testClient.IPNSThumbnailURL(testHash, testWidth, testHeight);
       expect(redirectURL).to.equal("http://localhost:8080/ipfs/testroot.com/" + filename);
     });
   });
@@ -55,12 +58,7 @@ describe("GenerateThumbnailURL", function () {
     });
     describe("with type specified", function () {
       it("includes type in URL", function () {
-        const redirectURL = GenerateThumbnailURL(
-          testHash,
-          testWidth,
-          testHeight,
-          ResourceType.Image
-        );
+        const redirectURL = GenerateThumbnailURL(testHash, testWidth, testHeight, "image");
         expect(redirectURL).to.startWith(DefaultConfig.endpoint);
 
         const url = new URL(redirectURL);
@@ -71,13 +69,7 @@ describe("GenerateThumbnailURL", function () {
 
   describe("with custom configuration", function () {
     it("returns correct URL", function () {
-      const redirectURL = GenerateThumbnailURL(
-        testHash,
-        testWidth,
-        testHeight,
-        ResourceType.Unknown,
-        testConfig
-      );
+      const redirectURL = testClient.GenerateThumbnailURL(testHash, testWidth, testHeight);
 
       expect(redirectURL).to.equal("https://endpoint.com/path/" + path);
     });
