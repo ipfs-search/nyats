@@ -2,6 +2,10 @@
 
 nyats (Not Yet Another Thumbnail Service) client-side caching IPFS thumbnailing server. Generates thumbnails for IPFS CID's, writes thumbnails to IPFS, adds them to MFS, publishes IPNS hash and returns redirect to thumbnail in MFS, allowing for efficient client-side caching.
 
+## Client library
+
+For usage in JS/TS, there's [nyats-client](https://www.npmjs.com/package/nyats-client), the official client library.
+
 ## Dependencies
 
 You need a local ipfs node; see: https://docs.ipfs.io/how-to/command-line-quick-start/

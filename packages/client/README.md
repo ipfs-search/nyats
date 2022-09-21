@@ -49,8 +49,12 @@ import {DefaultConfig, IPNSThumbnailURL, GenerateThumbnailURL} from "nyats-clien
 DefaultConfig.endpoint = "<API ENDPOINT>";
 DefaultConfig.gatewayURL = "<IPFS GATEWAY>";
 DefaultConfig.ipnsRoot = "/ipns/<PEER ID>/";
-client.IPNSThumbnailURL(...);
+IPNSThumbnailURL(...);
 ```
+
+## Server
+
+To run your own server (recommended), check out [nyats-server](https://www.npmjs.com/package/nyats-server).
 
 ## Disclaimer
 
