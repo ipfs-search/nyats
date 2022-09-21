@@ -1,6 +1,6 @@
 {
   "name": "nyats-client",
-  "version": "0.1.1-alpha.0",
+  "version": "0.2.0-alpha.0",
   "description": "Client for the nyats (Not Yet Another Thumbnail Service) IPFS thumbnailing server.",
   "keywords": [
     "nyats",
