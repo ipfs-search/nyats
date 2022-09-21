@@ -1,4 +1,4 @@
-import { default as childProcess } from "child_process";
+import { ChildProcessWithoutNullStreams, default as childProcess } from "child_process";
 import { default as pathToFfmpeg } from "ffmpeg-static";
 
 import makeDebugger from "debug";
@@ -6,6 +6,8 @@ import { Readable } from "stream";
 
 const debug = makeDebugger("nyats:ffmpeg_extractor");
 const ffmpeg_debug = makeDebugger("nyats:ffmpeg");
+
+type ffmpegParams = string[];
 
 const ffmpegCommonParams = [
   "-c:v",
@@ -20,40 +22,50 @@ const ffmpegCommonParams = [
 
 const ffmpegTimeout = 60000; // 60s default timeout
 
-async function ffmpegExtractor(params: string[]): Promise<Readable> {
-  const ffmpegParams = params.concat(ffmpegCommonParams);
-
-  ffmpeg_debug("ffmpeg ", ffmpegParams.join(" "));
-
-  const ffmpeg = childProcess.spawn(pathToFfmpeg, ffmpegParams, {
-    windowsHide: true,
-    timeout: ffmpegTimeout,
-  });
-
+function enableDebugging(process: ChildProcessWithoutNullStreams) {
   // Debug log stdout closing
-  ffmpeg.stdout.on("close", () => {
+  process.stdout.on("close", () => {
     debug("stdout closed");
   });
 
   // Pipe stderr to debug
   const stderr = [];
-  ffmpeg.stderr.on("data", (data) => {
+  process.stderr.on("data", (data) => {
     const strData = data.toString("utf8");
     stderr.push(strData);
     ffmpeg_debug(strData);
   });
 
-  ffmpeg.once("exit", (code) => {
+  process.once("exit", (code) => {
     if (code !== 0) {
-      throw new Error(`ffmpeg process exited with code ${code}`, {
-        cause: stderr.join(),
+      const output = stderr.join();
+
+      console.error(output);
+      throw new Error(`ffmpeg exited with code ${code}`, {
+        cause: output,
       });
     }
   });
 
-  ffmpeg.once("error", (err) => {
+  process.once("error", (err) => {
     throw err;
   });
+}
+
+function spawnFfmpeg(params: ffmpegParams): ChildProcessWithoutNullStreams {
+  return childProcess.spawn(pathToFfmpeg, params, {
+    windowsHide: true,
+    timeout: ffmpegTimeout,
+  });
+}
+
+async function ffmpegExtractor(params: ffmpegParams): Promise<Readable> {
+  const ffmpegParams = params.concat(ffmpegCommonParams);
+
+  ffmpeg_debug("ffmpeg ", ffmpegParams.join(" "));
+  const ffmpeg = spawnFfmpeg(ffmpegParams);
+
+  enableDebugging(ffmpeg);
 
   return new Promise((resolve) => {
     ffmpeg.once("spawn", () => {
