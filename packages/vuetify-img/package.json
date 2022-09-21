@@ -1,0 +1,31 @@
+{
+  "name": "nyats-vuetify-img",
+  "version": "0.1.0",
+  "description": "Vuetify3 thumbnailing component, based on v-img, rendering thumbnails for IPFS CID's using IPNS for caching and nyats API as fallback.",
+  "keywords": [
+    "nyats",
+    "vuetify",
+    "vuetify3",
+    "vue",
+    "thumbnail",
+    "ipfs",
+    "web3",
+    "ipns",
+    "v-img"
+  ],
+  "author": "Mathijs de Bruin <mathijs@mathijsfietst.nl>",
+  "homepage": "https://github.com/ipfs-search/nyats/tree/main/packages/vuetify-img#readme",
+  "license": "AGPL-3.0-or-later",
+  "main": "src/vuetify-img-cid.vue",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ipfs-search/nyats.git"
+  },
+  "scripts": {},
+  "bugs": {
+    "url": "https://github.com/ipfs-search/nyats/issues"
+  },
+  "dependencies": {
+    "nyats-client": "*"
+  }
+}
