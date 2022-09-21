@@ -12,8 +12,7 @@ IPFS caching thumbnailer. Generates thumbnails for IPFS CID's, adds them to IPFS
 ## Packages
 
 - [nyats-server](packages/server#readme): API server rendering thumbnails for IPFS content.
-- [nyats-client](packages/client#readme): Client for API server, generating appropriate URL's for generating and requesting thumbnails.
-- [nyats-vuetify-img](packages/vuetify-img#readme): Vuetify3 thumbnailing component, based on v-img, rendering thumbnails for IPFS CID's using IPNS for caching and nyats API as fallback.
+- [nyats-client](packages/client#readme): Client for API server, generating appropriate URL's for generating and requesting thumbnails. If you just want to use this library, go here!
 
 ## Getting started
 

@@ -2,6 +2,10 @@
 
 Client for the nyats (Not Yet Another Thumbnail Service) IPFS thumbnailing server.
 
+## Installation
+
+`npm i -S nyats-client`
+
 ## Usage
 
 The library consists of 2 functions:
