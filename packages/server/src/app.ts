@@ -26,10 +26,10 @@ export default (thumbnailer: Thumbnailer): express.Express => {
   app.get(
     "/thumbnail/:protocol/:cid/:width/:height/",
     async (req: express.Request, res: express.Response, next: express.NextFunction) => {
-      await param("protocol").isIn(Object.values(Protocol)).run(req);
+      await param("protocol").isIn(Object.keys(Protocol)).run(req);
       await param("width").isInt({ min: 16, max: nyatsMaxOutputWidth }).toInt().run(req);
       await param("height").isInt({ min: 16, max: nyatsMaxOutputHeight }).toInt().run(req);
-      await query("type").isIn(Object.values(Type)).run(req);
+      await query("type").isIn(Object.keys(Type)).run(req);
       await param("cid")
         .custom((v) => isIPFS.cid(v))
         .run(req);
@@ -40,7 +40,9 @@ export default (thumbnailer: Thumbnailer): express.Express => {
       }
 
       const data = matchedData(req);
-      const { protocol, cid, width, height, type } = data;
+      const { cid, width, height } = data;
+      const protocol = Protocol[data.protocol];
+      const type = Type[data.type];
 
       debug(
         `Received thumbnail request for ${protocol}://${cid} at ${width}x${height} of type ${type}`

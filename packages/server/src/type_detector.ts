@@ -2,6 +2,7 @@ import { default as mmagic } from "stream-mmmagic";
 import micromatch from "micromatch";
 import contentTypes from "./content_types.js";
 import { Readable } from "stream";
+import { Type } from "./types.js";
 
 function compileTypeRe() {
   const typeRe = {};
@@ -16,11 +17,11 @@ function compileTypeRe() {
 export default () => {
   const typeRe = compileTypeRe();
 
-  function typeFromMime(mime) {
+  function typeFromMime(mime): Type {
     for (const key of Object.keys(typeRe)) {
       const reLs = typeRe[key];
       if (reLs.some((re) => re.test(mime))) {
-        return key;
+        return Type[key];
       }
     }
 
@@ -28,7 +29,7 @@ export default () => {
   }
 
   return {
-    async detectType(input: Readable): Promise<[string, NodeJS.ReadableStream]> {
+    async detectType(input: Readable): Promise<[Type, NodeJS.ReadableStream]> {
       const [mime, output] = await mmagic.promise(input, { peekBytes: 1024 });
       // @ts-expect-error https://github.com/seangarner/node-stream-mmmagic/pull/19
       const type = typeFromMime(mime.type);

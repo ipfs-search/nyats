@@ -1,5 +1,5 @@
 export enum Protocol {
-  IPFS = "ipfs",
+  ipfs,
 }
 
 export type CID = string;
@@ -7,15 +7,14 @@ export type URL = string;
 export type Path = string;
 
 export enum Type {
-  Unknown = "",
-  Document = "document",
-  Audio = "audio",
-  Video = "video",
-  Image = "image",
+  document,
+  audio,
+  video,
+  image,
 }
 
 export interface Resource {
-  protocol: keyof typeof Protocol;
+  protocol: Protocol;
   cid: CID;
 }
 
@@ -25,7 +24,7 @@ export interface Dimensions {
 }
 
 export interface ThumbnailRequest extends Resource, Dimensions {
-  type?: keyof typeof Type;
+  type?: Type;
 }
 
 export interface Thumbnailer {

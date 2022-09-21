@@ -22,10 +22,23 @@ export default (ipfs: IPFS) => {
     return `/ipfs/${root}${path}`;
   }
 
+  async function getType(
+    request: ThumbnailRequest,
+    stream: Readable
+  ): Promise<[Type, NodeJS.ReadableStream]> {
+    let imgstream: NodeJS.ReadableStream;
+
+    if (request.type) {
+      debug(`Using type hint: ${request.type}`);
+      return [request.type, imgstream];
+    } else {
+      return typeDetector.detectType(stream);
+    }
+  }
+
   async function getThumbnail(request: ThumbnailRequest) {
     const { cid, width, height } = request;
     const protocol = Protocol[request.protocol];
-    let type: string = Type[request.type];
 
     debug(`Retreiving ${cid} from IPFS`);
     const input = ipfs.cat(`/${protocol}/${cid}`, {
@@ -33,24 +46,17 @@ export default (ipfs: IPFS) => {
     });
 
     const stream = Readable.from(input);
-
-    let imgstream: NodeJS.ReadableStream;
-    if (type) {
-      debug(`Using type hint: ${type}`);
-    } else {
-      [type, imgstream] = await typeDetector.detectType(stream);
-      debug(`Detected type: ${type}`);
-    }
+    const [type, imgstream] = await getType(request, stream);
 
     debug(`Generating ${width}x${height} thumbnail`);
     switch (type) {
-      case "image":
+      case Type.image:
         return imageThumbnailer(imgstream, width, height);
 
-      case "video":
+      case Type.video:
         return videoThumbnailer(`http://localhost:8080/ipfs/${cid}`, width, height);
 
-      case "audio":
+      case Type.audio:
         return audioThumbnailer(`http://localhost:8080/ipfs/${cid}`, width, height);
 
       default:
