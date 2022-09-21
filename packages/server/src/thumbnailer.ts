@@ -1,14 +1,14 @@
-import { strict as assert } from "assert";
 import { Readable } from "stream";
 import makeDebugger from "debug";
-import makeTypeDetector from "./type_detector.js";
-import makeImageThumbnailer from "./image_thumbnailer.js";
-import makeVideoThumbnailer from "./video_thumbnailer.js";
-import makeAudioThumbnailer from "./audio_thumbnailer.js";
-
-import { ipfsTimeout } from "./conf.js";
-import { CID, Path, Type, Protocol, ThumbnailRequest, URL } from "./types.js";
 import type { IPFS } from "ipfs-core-types";
+
+import makeTypeDetector from "./type_detector";
+import makeImageThumbnailer from "./image_thumbnailer";
+import makeVideoThumbnailer from "./video_thumbnailer";
+import makeAudioThumbnailer from "./audio_thumbnailer";
+
+import { ipfsTimeout } from "./conf";
+import { CID, Path, Type, Protocol, ThumbnailRequest, URL } from "./types";
 
 const debug = makeDebugger("nyats:thumbnailer");
 

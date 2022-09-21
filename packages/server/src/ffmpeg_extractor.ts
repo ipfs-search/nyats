@@ -9,6 +9,10 @@ const ffmpeg_debug = makeDebugger("nyats:ffmpeg");
 
 type ffmpegParams = string[];
 
+export interface ffmpegThumbnailer {
+  (url: string, width: number, height: number): Promise<Readable>;
+}
+
 const ffmpegCommonParams = [
   "-c:v",
   "libwebp",
@@ -78,7 +82,11 @@ function scaleFilter(width: number, height: number) {
   return `scale=${width}:${height}:force_original_aspect_ratio=increase,crop=${width}:${height}`;
 }
 
-export async function extractKeyFrames(url: string, width: number, height: number) {
+export const extractKeyFrames: ffmpegThumbnailer = async function (
+  url: string,
+  width: number,
+  height: number
+) {
   debug("Extract first 40% scene change 30 vframes(full frames).");
 
   return ffmpegExtractor([
@@ -102,9 +110,13 @@ export async function extractKeyFrames(url: string, width: number, height: numbe
     "-frames:v",
     "20",
   ]);
-}
+};
 
-export async function extractFirstFrame(url: string, width: number, height: number) {
+export const extractFirstFrame: ffmpegThumbnailer = async function (
+  url: string,
+  width: number,
+  height: number
+) {
   debug("Extracting first frame");
   return ffmpegExtractor([
     "-i",
@@ -116,9 +128,9 @@ export async function extractFirstFrame(url: string, width: number, height: numb
     "-vsync",
     "vfr",
   ]);
-}
+};
 
-export async function extractCoverArt(url: string, width: number, height: number) {
+export const extractCoverArt = async function (url: string, width: number, height: number) {
   // TODO: Use cover art archive as secondary source.
   // https://coverartarchive.org/release/79de4fa8-102c-402f-8040-3f1aa6d0c1b4/front
   debug("Extract cover art for streams with attached pictures, thumbnails or cover art.");
@@ -132,4 +144,4 @@ export async function extractCoverArt(url: string, width: number, height: number
     scaleFilter(width, height),
     "-frames:v 1",
   ]);
-}
+};
