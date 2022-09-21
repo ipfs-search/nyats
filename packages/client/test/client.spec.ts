@@ -5,7 +5,6 @@ use(chaiString);
 import {
   ClientConfig,
   DefaultConfig,
-  ResourceType,
   IPNSThumbnailURL,
   GenerateThumbnailURL,
   GetClient,
