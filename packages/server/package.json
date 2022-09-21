@@ -14,15 +14,15 @@
   "author": "Mathijs de Bruin <mathijs@mathijsfietst.nl>",
   "homepage": "https://github.com/ipfs-search/nyats/tree/main/packages/server#readme",
   "license": "AGPL-3.0-or-later",
-  "main": "src/cluster.js",
+  "main": "lib/cluster.js",
   "type": "module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ipfs-search/nyats.git"
   },
   "scripts": {
-    "start": "ts-node src/cluster.js",
-    "start:watch": "nodemon src/cluster.js",
+    "start": "node lib/cluster.js",
+    "start:watch": "nodemon src/cluster.ts",
     "clean": "rimraf lib/* coverage/*",
     "prepare": "npm run clean && npm run build",
     "prepublishOnly": "npm run lint && npm run test",

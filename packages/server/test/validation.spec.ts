@@ -4,9 +4,9 @@ import chaiHtttp from "chai-http";
 import { stubInterface } from "ts-sinon";
 import type { IPFS } from "ipfs-core-types";
 
-import { nyatsMaxOutputWidth, nyatsMaxOutputHeight } from "../src/conf";
-import makeApp from "../src/app";
-import makeThumbnailer from "../src/thumbnailer";
+import { nyatsMaxOutputWidth, nyatsMaxOutputHeight } from "../src/conf.js";
+import makeApp from "../src/app.js";
+import makeThumbnailer from "../src/thumbnailer.js";
 
 use(chaiHtttp);
 

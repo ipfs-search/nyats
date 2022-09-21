@@ -62,7 +62,7 @@ function getTransformer(
   metadata: sharp.Metadata,
   width: number,
   height: number
-) {
+): sharp.Sharp {
   const isAnimated = animateThumbnails && metadata.pages > 1;
   const webpOptions = getWebpOptions(metadata, isAnimated);
 
@@ -90,7 +90,11 @@ function getImage(stream: NodeJS.ReadableStream): sharp.Sharp {
   return image;
 }
 
-async function makeThumbnail(stream: NodeJS.ReadableStream, width: number, height: number) {
+async function makeThumbnail(
+  stream: NodeJS.ReadableStream,
+  width: number,
+  height: number
+): Promise<sharp.Sharp> {
   const image = getImage(stream);
 
   const metadata = await getMetadata(image);

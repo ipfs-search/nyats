@@ -1,6 +1,7 @@
 import { create } from "ipfs-http-client";
-import { ipfsAPI } from "./conf.js";
 import type { IPFS } from "ipfs-core-types";
+
+import { ipfsAPI } from "./conf.js";
 
 const ipfs: IPFS = create({
   url: ipfsAPI,

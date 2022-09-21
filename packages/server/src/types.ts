@@ -2,20 +2,19 @@ export enum Protocol {
   ipfs,
 }
 
-export type CID = string;
 export type URL = string;
 export type Path = string;
 
 export enum Type {
-  document,
-  audio,
-  video,
-  image,
+  document = "document",
+  audio = "audio",
+  video = "video",
+  image = "image",
 }
 
 export interface Resource {
   protocol: Protocol;
-  cid: CID;
+  cid: string;
 }
 
 export interface Dimensions {

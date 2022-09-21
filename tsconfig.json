@@ -2,10 +2,13 @@
   "compilerOptions": {
     "target": "ESNext",
     "module": "ESNext",
-    "moduleResolution": "Node",
+    "moduleResolution": "Node16",
     "strict": true,
     "skipLibCheck": true,
     "sourceMap": true,
     "esModuleInterop": true
+  },
+  "ts-node": {
+    "esm": true
   }
 }

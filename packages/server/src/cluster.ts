@@ -2,12 +2,12 @@ import { exit } from "node:process";
 import cluster from "cluster";
 import debuggerFactory from "debug";
 
-import makeApp from "./app";
-import ipfs from "./ipfs";
-import startIPNSPublisher from "./ipns_publisher";
-import makeThumbnailer from "./thumbnailer";
+import makeApp from "./app.js";
+import ipfs from "./ipfs.js";
+import startIPNSPublisher from "./ipns_publisher.js";
+import makeThumbnailer from "./thumbnailer.js";
 
-import { nyatsHost, nyatsPort, nyatsProcesses, updateInterval, ipfsGateway } from "./conf";
+import { nyatsHost, nyatsPort, nyatsProcesses, updateInterval, ipfsGateway } from "./conf.js";
 
 const debug = debuggerFactory("nyats:cluster");
 

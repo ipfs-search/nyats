@@ -5,9 +5,9 @@ import chaiAsPromised from "chai-as-promised";
 
 use(chaiAsPromised);
 
-import { ValidationError, default as makeThumbnailer } from "../src/image_thumbnailer";
-import { animateThumbnails } from "../src/conf";
-import { getStream } from "./util";
+import { ValidationError, default as makeThumbnailer } from "../src/image_thumbnailer.js";
+import { animateThumbnails } from "../src/conf.js";
+import { getStream } from "./util.js";
 
 const thumbnailer = makeThumbnailer();
 const tests = [

@@ -1,7 +1,8 @@
 import { default as mmagic } from "stream-mmmagic";
 import micromatch from "micromatch";
-import contentTypes from "./content_types.js";
 import { Readable } from "stream";
+
+import contentTypes from "./content_types.js";
 import { Type } from "./types.js";
 
 function compileTypeRe() {

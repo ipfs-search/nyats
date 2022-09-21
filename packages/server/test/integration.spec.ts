@@ -5,19 +5,15 @@ import fs from "fs";
 import sinon from "sinon";
 import { stubInterface } from "ts-sinon";
 import type { IPFS } from "ipfs-core-types";
-
 import { CID } from "multiformats/cid";
-
-import makeApp from "../src/app";
-import makeThumbnailer from "../src/thumbnailer";
-import { ipfsGateway } from "../src/conf";
-// import ipfs from "../src/ipfs";
-
 import sharp from "sharp";
-
-// OpenAPI matcher
 import { chaiPlugin as matchApiSchema } from "api-contract-validator";
 
+import makeApp from "../src/app.js";
+import makeThumbnailer from "../src/thumbnailer.js";
+import { ipfsGateway } from "../src/conf.js";
+
+// OpenAPI matcher
 const apiDefinitionsPath = path.resolve("../../openapi.yml");
 use(matchApiSchema({ apiDefinitionsPath }));
 

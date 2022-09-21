@@ -1,14 +1,16 @@
 import { Readable } from "stream";
 import makeDebugger from "debug";
 import type { IPFS } from "ipfs-core-types";
+import { CID } from "multiformats/cid";
 
-import makeTypeDetector from "./type_detector";
-import makeImageThumbnailer from "./image_thumbnailer";
-import makeVideoThumbnailer from "./video_thumbnailer";
-import makeAudioThumbnailer from "./audio_thumbnailer";
+import makeTypeDetector from "./type_detector.js";
+import makeImageThumbnailer from "./image_thumbnailer.js";
+import makeVideoThumbnailer from "./video_thumbnailer.js";
+import makeAudioThumbnailer from "./audio_thumbnailer.js";
 
-import { ipfsTimeout } from "./conf";
-import { CID, Path, Type, Protocol, ThumbnailRequest, URL } from "./types";
+import { ipfsTimeout } from "./conf.js";
+import { Path, Type, ThumbnailRequest, URL } from "./types.js";
+import { ReadableStream } from "node:stream/web";
 
 const debug = makeDebugger("nyats:thumbnailer");
 
@@ -18,27 +20,25 @@ export default (ipfs: IPFS) => {
   const videoThumbnailer = makeVideoThumbnailer();
   const audioThumbnailer = makeAudioThumbnailer();
 
-  async function getURL(root, path) {
-    return `/ipfs/${root}${path}`;
+  async function getURL(root: CID, path: string) {
+    return `/ipfs/${root.toString()}${path}`;
   }
 
   async function getType(
     request: ThumbnailRequest,
     stream: Readable
   ): Promise<[Type, NodeJS.ReadableStream]> {
-    let imgstream: NodeJS.ReadableStream;
-
     if (request.type) {
       debug(`Using type hint: ${request.type}`);
-      return [request.type, imgstream];
+      return [request.type, stream];
     } else {
+      debug("Detecting mime type");
       return typeDetector.detectType(stream);
     }
   }
 
-  async function getThumbnail(request: ThumbnailRequest) {
-    const { cid, width, height } = request;
-    const protocol = Protocol[request.protocol];
+  async function getThumbnail(request: ThumbnailRequest): Promise<Readable> {
+    const { protocol, cid, width, height } = request;
 
     debug(`Retreiving ${cid} from IPFS`);
     const input = ipfs.cat(`/${protocol}/${cid}`, {
@@ -46,10 +46,11 @@ export default (ipfs: IPFS) => {
     });
 
     const stream = Readable.from(input);
+
     const [type, imgstream] = await getType(request, stream);
 
     debug(`Generating ${width}x${height} thumbnail`);
-    switch (type) {
+    switch (type as Type) {
       case Type.image:
         return imageThumbnailer(imgstream, width, height);
 
@@ -88,7 +89,7 @@ export default (ipfs: IPFS) => {
     }
   }
 
-  async function writeThumbnail(thumbnail): Promise<CID> {
+  async function writeThumbnail(thumbnail: Readable): Promise<CID> {
     debug(`Adding thumbnail to IPFS`);
     const ipfsThumbnail = await ipfs.add(thumbnail, {
       cidVersion: 1,
@@ -100,13 +101,13 @@ export default (ipfs: IPFS) => {
       throw Error("invalid thumbnail generated: 0 bytes length");
     }
 
-    return ipfsThumbnail.cid.toString();
+    return ipfsThumbnail.cid;
   }
 
   async function addToMFS(cid: CID, path: Path) {
-    debug(`Adding thumbnail ${cid} to ${path}`);
+    debug(`Linking thumbnail ${cid} to ${path}`);
     try {
-      ipfs.files.cp(cid, path, { flush: false });
+      return ipfs.files.cp(cid, path, { flush: false });
     } catch (e) {
       if (
         e.name === "HTTPError" &&

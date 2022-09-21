@@ -5,17 +5,19 @@ import healthcheck from "express-healthcheck";
 import { param, query, validationResult, matchedData } from "express-validator";
 import urlJoin from "url-join";
 import isIPFS from "is-ipfs";
-import { ipfsGateway, nyatsMaxOutputHeight, nyatsMaxOutputWidth } from "./conf.js";
-
 import makeDebugger from "debug";
-import { Type, Protocol, Thumbnailer, ThumbnailRequest } from "./types";
+
+import { ipfsGateway, nyatsMaxOutputHeight, nyatsMaxOutputWidth } from "./conf.js";
+import { Type, Protocol, Thumbnailer, ThumbnailRequest } from "./types.js";
+
 const debug = makeDebugger("nyats:server");
 
 function getGatewayURL(req, ipfsPath) {
+  // TODO
   // We can use the referer to derive whether we've been requested from a gateway
   // and then use this to generate URL's.
-  const referer = req.headers["referer"];
-  debug(referer);
+  // const referer = req.headers["referer"];
+  // debug(referer);
 
   return urlJoin(ipfsGateway, ipfsPath);
 }
@@ -29,7 +31,7 @@ export default (thumbnailer: Thumbnailer): express.Express => {
       await param("protocol").isIn(Object.keys(Protocol)).run(req);
       await param("width").isInt({ min: 16, max: nyatsMaxOutputWidth }).toInt().run(req);
       await param("height").isInt({ min: 16, max: nyatsMaxOutputHeight }).toInt().run(req);
-      await query("type").isIn(Object.keys(Type)).run(req);
+      await query("type").optional().isIn(Object.keys(Type)).run(req);
       await param("cid")
         .custom((v) => isIPFS.cid(v))
         .run(req);
@@ -40,16 +42,11 @@ export default (thumbnailer: Thumbnailer): express.Express => {
       }
 
       const data = matchedData(req);
-      const { cid, width, height } = data;
-      const protocol = Protocol[data.protocol];
-      const type = Type[data.type];
+      const { protocol, type, cid, width, height } = data;
 
       debug(
         `Received thumbnail request for ${protocol}://${cid} at ${width}x${height} of type ${type}`
       );
-
-      console.log("Got protocol", protocol);
-      console.log("Protocol", Protocol);
 
       try {
         const thumbReq: ThumbnailRequest = data as ThumbnailRequest;

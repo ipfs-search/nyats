@@ -3,8 +3,8 @@ import sharp from "sharp";
 import { expect } from "chai";
 import makeDebugger from "debug";
 
-import makeThumbnailer from "../src/video_thumbnailer";
-import { server } from "./util";
+import makeThumbnailer from "../src/video_thumbnailer.js";
+import { server } from "./util.js";
 
 const debug = makeDebugger("nyats:spec:video_thumbnailer");
 const thumbnailer = makeThumbnailer();
