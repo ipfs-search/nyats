@@ -63,7 +63,7 @@ function startWorker() {
   app.listen(nyatsPort, nyatsHost);
 }
 
-if (cluster.isMaster) {
+if (cluster.isPrimary) {
   await checkIPFS();
 
   forkWorkers();
