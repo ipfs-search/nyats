@@ -10,7 +10,7 @@ import makeAudioThumbnailer from "./audio_thumbnailer.js";
 
 import { ipfsTimeout } from "./conf.js";
 import { Path, Type, ThumbnailRequest, URL } from "./types.js";
-import { ReadableStream } from "node:stream/web";
+import { GetGatewayURL } from "./ipfs.js";
 
 const debug = makeDebugger("nyats:thumbnailer");
 
@@ -20,8 +20,15 @@ export default (ipfs: IPFS) => {
   const videoThumbnailer = makeVideoThumbnailer();
   const audioThumbnailer = makeAudioThumbnailer();
 
-  async function getURL(root: CID, path: string) {
+  function getRootPath(root: CID, path: string) {
+    // Return path within root.
     return `/ipfs/${root.toString()}${path}`;
+  }
+
+  function GetCIDURL(cid: CID): string {
+    // Return gateway URL based on specified gateway.
+    const path = `/ipfs/${cid.toString()}`;
+    return GetGatewayURL(path);
   }
 
   async function getType(
@@ -55,10 +62,10 @@ export default (ipfs: IPFS) => {
         return imageThumbnailer(imgstream, width, height);
 
       case Type.video:
-        return videoThumbnailer(`http://localhost:8080/ipfs/${cid}`, width, height);
+        return videoThumbnailer(GetCIDURL(cid), width, height);
 
       case Type.audio:
-        return audioThumbnailer(`http://localhost:8080/ipfs/${cid}`, width, height);
+        return audioThumbnailer(GetCIDURL(cid), width, height);
 
       default:
         throw Error(`unsupported type: ${type}`);
@@ -75,7 +82,7 @@ export default (ipfs: IPFS) => {
       // This might unecessarily cause lag
       const root = await ipfs.files.stat("/", { hash: true });
 
-      return getURL(root.cid, path);
+      return getRootPath(root.cid, path);
     } catch (error) {
       debug(`MFS result: ${error}`);
 
@@ -135,7 +142,7 @@ export default (ipfs: IPFS) => {
     await addToMFS(ipfsThumbnail, path);
     const rootCid = await flushRootCID();
 
-    return getURL(rootCid, path);
+    return getRootPath(rootCid, path);
   }
 
   return async (request: ThumbnailRequest): Promise<URL> => {

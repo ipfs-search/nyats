@@ -1,3 +1,5 @@
+import { CID } from "multiformats/cid";
+
 export enum Protocol {
   ipfs,
 }
@@ -14,7 +16,7 @@ export enum Type {
 
 export interface Resource {
   protocol: Protocol;
-  cid: string;
+  cid: CID;
 }
 
 export interface Dimensions {

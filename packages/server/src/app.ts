@@ -3,24 +3,14 @@ import express from "express";
 import { strict as assert } from "assert";
 import healthcheck from "express-healthcheck";
 import { param, query, validationResult, matchedData } from "express-validator";
-import urlJoin from "url-join";
 import isIPFS from "is-ipfs";
 import makeDebugger from "debug";
 
-import { ipfsGateway, nyatsMaxOutputHeight, nyatsMaxOutputWidth } from "./conf.js";
+import { nyatsMaxOutputHeight, nyatsMaxOutputWidth } from "./conf.js";
 import { Type, Protocol, Thumbnailer, ThumbnailRequest } from "./types.js";
+import { GetGatewayURL } from "./ipfs.js";
 
 const debug = makeDebugger("nyats:server");
-
-function getGatewayURL(req, ipfsPath) {
-  // TODO
-  // We can use the referer to derive whether we've been requested from a gateway
-  // and then use this to generate URL's.
-  // const referer = req.headers["referer"];
-  // debug(referer);
-
-  return urlJoin(ipfsGateway, ipfsPath);
-}
 
 export default (thumbnailer: Thumbnailer): express.Express => {
   const app = express();
@@ -54,7 +44,7 @@ export default (thumbnailer: Thumbnailer): express.Express => {
         assert(ipfsPath);
 
         res.setHeader("x-ipfs-path", ipfsPath);
-        const redirectURL = getGatewayURL(req, ipfsPath);
+        const redirectURL = GetGatewayURL(ipfsPath);
 
         debug(`Redirecting to ${redirectURL}`);
         res.redirect(301, redirectURL);
