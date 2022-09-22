@@ -14,7 +14,6 @@ const cid = "QmcRD4wkPPi6dig81r5sLj9Zm1gDCL4zgpEj9CfuRrGbzF";
 const width = 100;
 const height = 100;
 const protocol = "ipfs";
-const type = "image;";
 
 describe("app validation tests", function () {
   let app;
