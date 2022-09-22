@@ -19,12 +19,21 @@ You need a local ipfs node; see: https://docs.ipfs.io/how-to/command-line-quick-
 4. Open `http://localhost:9614/thumbnail/<protocol>/<cid>/<width>/<height>`, and behold.
    Example: http://localhost:9614/thumbnail/ipfs/QmcRD4wkPPi6dig81r5sLj9Zm1gDCL4zgpEj9CfuRrGbzF/200/200
 
+## Development
+
+For development, we recommend using `npm run start:watch`, which will watch the code and automatically rebuild and restart the server (using nodemon and ts-node).
+
+Example with debugging, a single process and local IPFS gateway:
+
+```sh
+$ DEBUG=nyats* NYATS_PROCESSES=1 IPFS_GATEWAY=http://127.0.0.1:8080 npm run start:watch
+```
+
 ## Configuration
 
-The API can be configured through the following environment variables:
+The main configuration options are the following, the rest can be found in [`src/config.ts`](src/config.ts):
 
 - `NYATS_SERVER_HOST` (default: `localhost`)
 - `NYATS_SERVER_PORT` (default: `9614`)
 - `IPFS_API` (default: `http://localhost:5001`)
 - `IPFS_GATEWAY` (default: `https://gateway.ipfs.io`)
-- `IPNS_UPDATE_INTERVAL` (in ms, default `60000`, 60s)
