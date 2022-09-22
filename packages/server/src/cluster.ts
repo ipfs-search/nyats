@@ -7,7 +7,7 @@ import ipfs from "./ipfs.js";
 import startIPNSPublisher from "./ipns_publisher.js";
 import makeThumbnailer from "./thumbnailer.js";
 
-import { nyatsHost, nyatsPort, nyatsProcesses, updateInterval, ipfsGateway } from "./conf.js";
+import { nyatsHost, nyatsPort, nyatsProcesses, updateInterval } from "./conf.js";
 
 const debug = debuggerFactory("nyats:cluster");
 
@@ -65,7 +65,6 @@ function startWorker() {
 
 if (cluster.isMaster) {
   await checkIPFS();
-  console.log(`IPFS gateway: ${ipfsGateway}`);
 
   forkWorkers();
   startIPNSPublisher(ipfs, updateInterval);

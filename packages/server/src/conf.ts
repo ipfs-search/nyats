@@ -10,5 +10,6 @@ export const nyatsMaxInputHeight = parseInt(process.env.NYATS_MAX_HEIGHT || "819
 export const updateInterval = parseInt(process.env.IPNS_UPDATE_INTERVAL || "60000");
 export const ipfsAPI = process.env.IPFS_API || "http://localhost:5001";
 export const ipfsTimeout = parseInt(process.env.IPFS_TIMEOUT || "120000");
-export const ipfsGateway = process.env.IPFS_GATEWAY || "https://dweb.link";
+export const publicIPFSGateway = process.env.PUBLIC_IPFS_GATEWAY || "https://dweb.link";
+export const privateIPFSGateway = process.env.PRIVATE_IPFS_GATEWAY || "http://127.0.0.1:8080";
 export const animateThumbnails = false;

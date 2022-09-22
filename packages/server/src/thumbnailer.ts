@@ -28,7 +28,7 @@ export default (ipfs: IPFS) => {
   function GetCIDURL(cid: CID): string {
     // Return gateway URL based on specified gateway.
     const path = `/ipfs/${cid.toString()}`;
-    return GetGatewayURL(path);
+    return GetGatewayURL(path, "private");
   }
 
   async function getType(

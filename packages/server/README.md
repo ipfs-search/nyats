@@ -36,4 +36,5 @@ The main configuration options are the following, the rest can be found in [`src
 - `NYATS_SERVER_HOST` (default: `localhost`)
 - `NYATS_SERVER_PORT` (default: `9614`)
 - `IPFS_API` (default: `http://localhost:5001`)
-- `IPFS_GATEWAY` (default: `https://gateway.ipfs.io`)
+- `PUBLIC_IPFS_GATEWAY` (default: `https://dweb.link`)
+- `PRIVATE_IPFS_GATEWAY` (default: `http://127.0.0.1:8080`)

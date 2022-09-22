@@ -44,7 +44,7 @@ export default (thumbnailer: Thumbnailer): express.Express => {
         assert(ipfsPath);
 
         res.setHeader("x-ipfs-path", ipfsPath);
-        const redirectURL = GetGatewayURL(ipfsPath);
+        const redirectURL = GetGatewayURL(ipfsPath, "public");
 
         debug(`Redirecting to ${redirectURL}`);
         res.redirect(301, redirectURL);

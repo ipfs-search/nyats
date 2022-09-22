@@ -11,7 +11,7 @@ import { chaiPlugin as matchApiSchema } from "api-contract-validator";
 
 import makeApp from "../src/app.js";
 import makeThumbnailer from "../src/thumbnailer.js";
-import { ipfsGateway } from "../src/conf.js";
+import { publicIPFSGateway } from "../src/conf.js";
 
 // OpenAPI matcher
 const apiDefinitionsPath = path.resolve("../../openapi.yml");
@@ -96,7 +96,7 @@ describe("app integration tests", function () {
     it("Satisfies OpenAPI spec", expectOpenAPISchema());
     it(
       "Returns correct thumbnail URL",
-      expectThumbnailURL(`${ipfsGateway}/ipfs/${newRootCid}${thumbPath}`)
+      expectThumbnailURL(`${publicIPFSGateway}/ipfs/${newRootCid}${thumbPath}`)
     );
 
     it("Has WebP format and correct dimensions", async function () {
@@ -120,7 +120,7 @@ describe("app integration tests", function () {
     it("Satisfies OpenAPI spec", expectOpenAPISchema());
     it(
       "Returns correct thumbnail URL",
-      expectThumbnailURL(`${ipfsGateway}/ipfs/${rootCid}${thumbPathExists}`)
+      expectThumbnailURL(`${publicIPFSGateway}/ipfs/${rootCid}${thumbPathExists}`)
     );
   });
 });
