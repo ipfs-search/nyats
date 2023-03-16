@@ -12,8 +12,30 @@ IPFS caching thumbnailer. Generates thumbnails for IPFS CID's, adds them to IPFS
 ## Packages
 
 - [nyats-server](packages/server#readme): API server rendering thumbnails for IPFS content.
-- [nyats-client](packages/client#readme): Client for API server, generating appropriate URL's for generating and requesting thumbnails.
-- [nyats-vuetify-img](packages/vuetify-img#readme): Vuetify3 thumbnailing component, based on v-img, rendering thumbnails for IPFS CID's using IPNS for caching and nyats API as fallback.
+- [nyats-client](packages/client#readme): Client for API server, generating appropriate URL's for generating and requesting thumbnails. If you just want to use this library, go here!
+
+## Getting started
+
+To use any of the aforementioned packages, please refer to their respective README's.
+
+As for developing, we're using [lerna](https://lerna.js.org/) to organize nyats-related packages together and to manage their dependencies. Common development dependencies reside in the root repository.
+
+To start developing, you can install all the project's dependencies as follows:
+
+```sh
+npm i && npm run bootstrap
+```
+
+## Commands
+
+To facilitate development, the following commands will be run through the root package on all subpackages (which have that command available):
+
+- `npm run bootstrap`: Install packages and their dependencies, such that they can use one another.
+- `npm run build`: Build packages.
+- `npm run test`: Test packages.
+- `npm run lint`: Lint packages.
+- `npm run clean`: ... ok, you get the gist, no?
+- `npm run publish`: Also, yeah... publish All the Packages!
 
 ## Contributors
 

@@ -1,9 +1,11 @@
+root: true
 env:
   es2021: true
   node: true
 extends:
   - eslint:recommended
   - plugin:@typescript-eslint/recommended
+  - plugin:mocha/recommended
   - prettier
 parser: "@typescript-eslint/parser"
 parserOptions:
